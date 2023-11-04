@@ -38,11 +38,11 @@ function tick(timestamp) {
         camera.pos.z += Math.cos(camera.rot.y) * speed
     }
     if (keys["KeyA"]) {
-        camera.pos.x += Math.cos(camera.rot.y) * speed
+        camera.pos.x -= Math.cos(camera.rot.y) * speed
         camera.pos.z += Math.sin(camera.rot.y) * speed
     }
     if (keys["KeyD"]) {
-        camera.pos.x -= Math.cos(camera.rot.y) * speed
+        camera.pos.x += Math.cos(camera.rot.y) * speed
         camera.pos.z -= Math.sin(camera.rot.y) * speed
     }
     if (keys["Space"]) {
@@ -50,6 +50,14 @@ function tick(timestamp) {
     }
     if (keys["ShiftLeft"]) {
         camera.pos.y -= speed
+    }
+
+    if (jKeys["Escape"] || jKeys["Tab"]) {
+        input.unlockMouse()
+    }
+
+    if (mouse.lclick) {
+        input.lockMouse()
     }
 
     view = mat4.create()
@@ -71,6 +79,24 @@ function tick(timestamp) {
 	webgl.render()
 
     input.updateInput()
+}
+
+var sensitivity = 0.005
+
+input.mouseMove = (event) => {
+    if (!input.isMouseLocked()) {
+        this.mouse.x = event.clientX
+		this.mouse.y = event.clientY
+    } else {
+        camera.rot.x -= event.movementY*sensitivity
+		if (camera.rot.x > Math.PI/2*0.99) {
+			camera.rot.x = Math.PI/2*0.99
+		}
+		if (camera.rot.x < -Math.PI/2*0.99) {
+			camera.rot.x = -Math.PI/2*0.99
+		}
+		camera.rot.y -= event.movementX*sensitivity	
+    }
 }
 
 requestAnimationFrame(tick)
