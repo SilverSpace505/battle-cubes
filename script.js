@@ -9,7 +9,7 @@ const projection = mat4.create()
 
 var camera = {pos: {x: 0, y: 0, z: 0}, rot: {x: 0, y: -Math.PI/2-Math.PI*1000, z: 0}}
 
-var floor = new webgl.Box(0, -1, 0, 10, 1, 10, [255, 255, 255, 1])
+var floor = new webgl.Box(0, -1, 0, 10, 0.1, 10, [0.25, 0.75, 0])
 
 function tick(timestamp) {
     requestAnimationFrame(tick)
