@@ -9,7 +9,16 @@ const projection = mat4.create()
 
 var camera = {pos: {x: 0, y: 0, z: 0}, rot: {x: 0, y: -Math.PI/2-Math.PI*1000, z: 0}}
 
+var grassTexture = new webgl.Texture("assets/grass.png")
+
 var floor = new webgl.Box(0, -1, 0, 100, 0.1, 100, [0.25, 0.75, 0])
+floor.useTexture = true
+floor.texture = grassTexture
+for (let i = 0; i < 6; i++) {
+    floor.uvs.push(0, 0, 1, 1, 1, 0, 0, 1)
+}
+floor.uvMul = 15
+floor.updateBuffers()
 
 function tick(timestamp) {
     requestAnimationFrame(tick)
