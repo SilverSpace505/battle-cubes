@@ -2,7 +2,7 @@
 class Player extends Object3D {
     vel = {x: 0, y: 0, z: 0}
     constructor(x, y, z) {
-        super(x, y, z, 1, 3, 1)
+        super(x, y, z, 0.5, 1.9, 0.5)
     }
     update() {
         if (keys["KeyW"]) {
