@@ -11,7 +11,15 @@ var camera = {pos: {x: 0, y: 0, z: 0}, rot: {x: 0, y: -Math.PI/2-Math.PI*1000, z
 
 var grassTexture = new webgl.Texture("assets/grass.png")
 
-var floor = new webgl.Box(0, -1, 0, 100, 0.1, 100, [0.25, 0.75, 0])
+var boxes = []
+
+function createBox(x, y, z, width, height, length, colour) {
+    let newBox = new webgl.Box(x, y, z, width, height, length, colour)
+    boxes.push(newBox)
+    return newBox
+}
+
+var floor = createBox(0, -1, 0, 100, 0.1, 100, [0.25, 0.75, 0])
 floor.useTexture = true
 floor.texture = grassTexture
 for (let i = 0; i < 6; i++) {
@@ -19,6 +27,8 @@ for (let i = 0; i < 6; i++) {
 }
 floor.uvMul = 15
 floor.updateBuffers()
+
+var player = new Player(0, 1, 0)
 
 function tick(timestamp) {
     requestAnimationFrame(tick)
@@ -36,30 +46,8 @@ function tick(timestamp) {
 
     input.setGlobals()
 
-    let speed = 0.1
-
-    if (keys["KeyW"]) {
-        camera.pos.x -= Math.sin(camera.rot.y) * speed
-        camera.pos.z -= Math.cos(camera.rot.y) * speed
-    }
-    if (keys["KeyS"]) {
-        camera.pos.x += Math.sin(camera.rot.y) * speed
-        camera.pos.z += Math.cos(camera.rot.y) * speed
-    }
-    if (keys["KeyA"]) {
-        camera.pos.x -= Math.cos(camera.rot.y) * speed
-        camera.pos.z += Math.sin(camera.rot.y) * speed
-    }
-    if (keys["KeyD"]) {
-        camera.pos.x += Math.cos(camera.rot.y) * speed
-        camera.pos.z -= Math.sin(camera.rot.y) * speed
-    }
-    if (keys["Space"]) {
-        camera.pos.y += speed
-    }
-    if (keys["ShiftLeft"]) {
-        camera.pos.y -= speed
-    }
+    player.update()
+    camera.pos = {x:player.pos.x, y:player.pos.y, z:player.pos.z}
 
     if (jKeys["Escape"] || jKeys["Tab"]) {
         input.unlockMouse()
