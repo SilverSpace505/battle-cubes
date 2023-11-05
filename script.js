@@ -25,8 +25,12 @@ floor.texture = grassTexture
 for (let i = 0; i < 6; i++) {
     floor.uvs.push(0, 0, 1, 1, 1, 0, 0, 1)
 }
-floor.uvMul = 15
+floor.uvMul = 50
 floor.updateBuffers()
+
+createBox(2, -0.5, 0, 1, 1, 1, [0.5, 0.3, 0.1])
+createBox(2, 0.5, 1.5, 1, 1, 1, [0.5, 0.3, 0.1])
+createBox(0.5, 1.5, 1.5, 1, 1, 1, [0.5, 0.3, 0.1])
 
 var player = new Player(0, 1, 0)
 
