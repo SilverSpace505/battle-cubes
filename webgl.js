@@ -367,11 +367,9 @@ class Webgl {
 					// gl.depthMask(false)
 					mat4.perspective(projection, 60 * Math.PI/180, gl.canvas.width / gl.canvas.height, 0.01, 5000)
 					webgl.update()
-					gl.stencilFunc(gl.EQUAL, 1, 0xFF)
-					gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP)
+					// gl.depthFunc(gl.LEQUAL)
 				} else {
-					gl.stencilFunc(gl.ALWAYS, 1, 0xFF)
-					gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE)
+					// gl.depthFunc(gl.LESS)
 					// gl.enable(gl.DEPTH_TEST)
 					// gl.depthMask(true)
 				}

@@ -3,6 +3,8 @@ class Player extends Object3D {
     vel = {x: 0, y: 0, z: 0}
     laserShooter
     lso // laser shooter origin
+    lsv = 0
+    bullets = []
     constructor(x, y, z) {
         super(x, y, z, 0.5, 1.9, 0.5)
         
@@ -45,7 +47,24 @@ class Player extends Object3D {
         this.vel.y -= gravity * delta
         this.move(this.vel.x * delta, this.vel.y * delta, this.vel.z * delta, 1/delta)
 
-        this.laserShooter.rot.x += 0.01
+        if (mouse.lclick) {
+            this.lsv = 6
+            this.laserShooter.rot.x = 0
+            let rotated = rotVec({x:0, y:0, z:-1*10}, camera.rot.x, camera.rot.y, camera.rot.z)
+            this.bullets.push(new Bullet(camera.pos.x, camera.pos.y, camera.pos.z, rotated.x, rotated.y, rotated.z, 0.1))
+        }
+
+        for (let bullet of this.bullets) {
+            bullet.update()
+        }
+
+        this.lsv -= 60 * delta
+
+        this.laserShooter.rot.x += this.lsv * delta
+
+        if (this.laserShooter.rot.x < 0) {
+            this.laserShooter.rot.x = 0
+        }
 
         while (this.checkCollide()) {
             this.pos.y += 0.01
