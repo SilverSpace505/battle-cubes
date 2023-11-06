@@ -60,10 +60,10 @@ class Player extends Object3D {
             this.pos.x += x / steps
             
             if (this.checkCollide()) {
-                this.pos.y += 0.025
+                this.pos.y += 0.05
                 if (this.checkCollide()) {
                     this.pos.x = lastX
-                    this.pos.y -= 0.025
+                    this.pos.y -= 0.05
                 }
             }
             var lastZ = this.pos.z
