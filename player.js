@@ -9,11 +9,11 @@ class Player extends Object3D {
         super(x, y, z, 0.5, 1.9, 0.5)
         
         let laserShooterG = []
-        laserShooterG.push(new webgl.Box(0, 1-0.875, 0, 0.2, 0.3, 0.8, [1, 1, 1]))
-        laserShooterG.push(new webgl.Box(0, 0.7-0.875, 0.3, 0.2, 0.3, 0.2, [1, 1, 1]))
-        laserShooterG.push(new webgl.Box(0, 0.8-0.875, 0.1, 0.15, 0.15, 0.5, [0, 1, 1]))
         laserShooterG.push(new webgl.Box(0, 1.05-0.875, -0.4, 0.1, 0.1, 0.2, [0, 1, 1]))
         laserShooterG.push(new webgl.Box(0, 0.95-0.875, -0.4, 0.05, 0.05, 0.1, [0, 1, 1]))
+        laserShooterG.push(new webgl.Box(0, 0.8-0.875, 0.1, 0.15, 0.15, 0.5, [0, 1, 1]))
+        laserShooterG.push(new webgl.Box(0, 0.7-0.875, 0.3, 0.2, 0.3, 0.2, [1, 1, 1]))
+        laserShooterG.push(new webgl.Box(0, 1-0.875, 0, 0.2, 0.3, 0.8, [1, 1, 1]))
         laserShooterG[2].rot.x = Math.PI/4
         for (let mesh of laserShooterG) {
             mesh.ignoreDepth = true
