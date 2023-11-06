@@ -133,11 +133,42 @@ class Webgl {
 			this.sortObjs()
 		}
 		this.ri = 0
+
+		let solid = []
+		let transparent = []
+		let ignoreDepth = []
+
 		for (let mesh of this.meshes) {
 			if (this.doRender) {
-				mesh.render()
-				this.ri++
+				if (mesh.ignoreDepth) {
+					ignoreDepth.push(mesh)
+				} else if (mesh.alpha < 1 || mesh.useAlpha == true) {
+					transparent.push(mesh)
+				} else {
+					solid.push(mesh)
+				}
 			}
+		}
+
+		gl.depthMask(true)
+		gl.enable(gl.DEPTH_TEST)
+
+		for (let mesh of solid) {
+			mesh.render()
+		}
+
+		gl.depthMask(false)
+
+		for (let mesh of transparent) {
+			mesh.render()
+		}
+
+		gl.disable(gl.DEPTH_TEST)
+		mat4.perspective(projection, 60 * Math.PI/180, gl.canvas.width / gl.canvas.height, 0.01, 5000)
+		this.update()
+
+		for (let mesh of ignoreDepth) {
+			mesh.render()
 		}
 	}
 
@@ -356,17 +387,16 @@ class Webgl {
 					gl.uniform1f(webgl.uniforms.rDistance, 200)
 				}
 
-				if (this.ignoreDepth) {
-					gl.disable(gl.DEPTH_TEST)
-					// gl.depthMask(false)
-					mat4.perspective(projection, 60 * Math.PI/180, gl.canvas.width / gl.canvas.height, 0.01, 5000)
-					webgl.update()
-					// gl.depthFunc(gl.LEQUAL)
-				} else {
-					// gl.depthFunc(gl.LESS)
-					// gl.enable(gl.DEPTH_TEST)
-					// gl.depthMask(true)
-				}
+				// if (this.ignoreDepth) {
+				// 	gl.disable(gl.DEPTH_TEST)
+				// 	// gl.depthMask(false)
+					
+				// 	// gl.depthFunc(gl.LEQUAL)
+				// } else {
+				// 	// gl.depthFunc(gl.LESS)
+				// 	gl.enable(gl.DEPTH_TEST)
+				// 	// gl.depthMask(true)
+				// }
 				
 				if (this.oneSide) {
 					gl.enable(gl.CULL_FACE)
@@ -406,13 +436,6 @@ class Webgl {
 				
 				gl.drawElements(gl.TRIANGLES, this.faces.length, gl.UNSIGNED_INT, 0)
 				gl.bindVertexArray(null)
-
-				if (this.ignoreDepth) {
-					gl.enable(gl.DEPTH_TEST)
-					gl.depthMask(true)
-					mat4.perspective(projection, fov * Math.PI/180, gl.canvas.width / gl.canvas.height, 0.01, 5000)
-					webgl.update()
-				}
 
 				if (this.ignoreFog) {
 					gl.uniform1f(webgl.uniforms.rDistance, webgl.rDistance)

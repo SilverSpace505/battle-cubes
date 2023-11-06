@@ -27,22 +27,42 @@ class Player extends Object3D {
         this.vel.z -= (1 - 0.5) * delta * this.vel.z * 100
         this.vel.y -= gravity * delta
 
+        let moveDir = {x: 0, z: 0}
+
         if (keys["KeyW"]) {
-            this.vel.x -= Math.sin(camera.rot.y) * speed * delta
-            this.vel.z -= Math.cos(camera.rot.y) * speed * delta
+            moveDir.x -= Math.sin(camera.rot.y)
+            moveDir.z -= Math.cos(camera.rot.y)
         }
         if (keys["KeyS"]) {
-            this.vel.x += Math.sin(camera.rot.y) * speed * delta
-            this.vel.z += Math.cos(camera.rot.y) * speed * delta
+            moveDir.x += Math.sin(camera.rot.y)
+            moveDir.z += Math.cos(camera.rot.y)
         }
         if (keys["KeyA"]) {
-            this.vel.x -= Math.cos(camera.rot.y) * speed * delta
-            this.vel.z += Math.sin(camera.rot.y) * speed * delta
+            moveDir.x -= Math.cos(camera.rot.y)
+            moveDir.z += Math.sin(camera.rot.y)
         }
         if (keys["KeyD"]) {
-            this.vel.x += Math.cos(camera.rot.y) * speed * delta
-            this.vel.z -= Math.sin(camera.rot.y) * speed * delta
+            moveDir.x += Math.cos(camera.rot.y)
+            moveDir.z -= Math.sin(camera.rot.y)
         }
+
+        let length = Math.sqrt(moveDir.x**2 + moveDir.z**2)
+        if (length > 0) {
+            moveDir.x /= length; moveDir.z /= length
+        }
+
+        if (this.sprinting) {
+            this.speed *= 2
+        }
+
+        this.vel.x += moveDir.x * speed * delta
+        this.vel.z += moveDir.z * speed * delta
+
+        if (this.sprinting) {
+            this.speed /= 2
+        }
+
+
         if (jKeys["Space"] && this.falling < 0.1) {
             this.vel.y = jump
         }

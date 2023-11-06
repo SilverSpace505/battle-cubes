@@ -3,6 +3,7 @@ var lastTime = 0
 var delta = 0
 
 var fov = 60
+var tFov = 60
 
 var view = mat4.create()
 const projection = mat4.create()
@@ -94,10 +95,14 @@ createBox(7, 1.5, 2, 3, 3, 3, [0.75, 0.75, 0.75], grassTexture)
 createBox(10, 2, 3, 3, 4, 3, [0.75, 0.75, 0.75], grassTexture)
 
 house(-10, 0, 0, 5, 4, 5)
+house(-10, 0, -6, 3, 10, 3)
 
 tree(0, 0, 10, 0)
 tree(1, 0, 8, 1000)
 tree(-1, 0, 9, 2000)
+
+let secret = createBox(4, 4, 5, 1, 1, 1, [1, 1, 1])
+secret.alpha = 0.05
 
 let testG = []
 let ts = 0.2
@@ -154,6 +159,13 @@ function tick(timestamp) {
     player.lso.rot = {...camera.rot}
     player.lso.update()
     player.laserShooter.update()
+
+    tFov = 60
+    if (player.sprinting) {
+        tFov = 60*1.33
+    }
+
+    fov += (tFov - fov) * delta * 10
 
     if (jKeys["Escape"] || jKeys["Tab"]) {
         input.unlockMouse()
