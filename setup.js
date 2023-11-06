@@ -3,11 +3,15 @@ var canvas = document.getElementById("canvas")
 var gl = canvas.getContext("webgl2", { antialias: false })
 
 var gravity = 0.3 * 60
-var speed = 500
+var speed = 250
 var friction = 0.5	 
 var airFriction = 0.95
 var airSpeed = 0.085 * 120 
 var jump = 7
+
+var bounces = 5
+var lifeTime = 1
+var spread = 0.01
 
 function rotVec(vec, rx, ry, rz) {
     // Rotation around Z-axis

@@ -16,6 +16,7 @@ var stoneTexture = new webgl.Texture("assets/stone.png")
 var leavesTexture = new webgl.Texture("assets/leaves.png")
 
 var boxes = []
+var explosions = []
 
 function srand(seed) {
     seed += 748473
@@ -162,6 +163,15 @@ function tick(timestamp) {
         input.lockMouse()
     }
 
+    for (let i = 0; i < explosions.length; i++) {
+        explosions[i].update()
+        if (explosions[i].size2 < 0) {
+            explosions[i].mesh.delete()
+            explosions.splice(i, 1)
+            i--
+        }
+    }
+
     view = mat4.create()
 	mat4.translate(view, view, [camera.pos.x, camera.pos.y, camera.pos.z])
 	mat4.rotateY(view, view, camera.rot.y)
@@ -176,10 +186,12 @@ function tick(timestamp) {
 
 	gl.enable(gl.BLEND)
 	gl.clear(gl.STENCIL_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
+    gl.enable(gl.BLEND)
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
 	mat4.perspective(projection, fov * Math.PI / 180, gl.canvas.width / gl.canvas.height, 0.01, 5000)
 
     gl.enable(gl.DEPTH_TEST)
-    gl.enable(gl.STENCIL_TEST)
 
 	webgl.render()
 

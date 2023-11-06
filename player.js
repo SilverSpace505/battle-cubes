@@ -23,6 +23,10 @@ class Player extends Object3D {
         this.lso = new webgl.Group(0, 0, 0, [this.laserShooter])
     }
     update() {
+        this.vel.x -= (1 - 0.5) * delta * this.vel.x * 100
+        this.vel.z -= (1 - 0.5) * delta * this.vel.z * 100
+        this.vel.y -= gravity * delta
+
         if (keys["KeyW"]) {
             this.vel.x -= Math.sin(camera.rot.y) * speed * delta
             this.vel.z -= Math.cos(camera.rot.y) * speed * delta
@@ -42,20 +46,22 @@ class Player extends Object3D {
         if (jKeys["Space"] && this.falling < 0.1) {
             this.vel.y = jump
         }
-        this.vel.x *= 0.5
-        this.vel.z *= 0.5
-        this.vel.y -= gravity * delta
         this.move(this.vel.x * delta, this.vel.y * delta, this.vel.z * delta, 1/delta)
 
         if (mouse.lclick) {
             this.lsv = 6
             this.laserShooter.rot.x = 0
-            let rotated = rotVec({x:0, y:0, z:-1*10}, camera.rot.x, camera.rot.y, camera.rot.z)
+            let rotated = rotVec({x:0, y:0, z:-1*100}, camera.rot.x + (Math.random()-0.5)*2*spread, camera.rot.y + (Math.random()-0.5)*2*spread, camera.rot.z + (Math.random()-0.5)*2*spread)
             this.bullets.push(new Bullet(camera.pos.x, camera.pos.y, camera.pos.z, rotated.x, rotated.y, rotated.z, 0.1))
         }
 
-        for (let bullet of this.bullets) {
-            bullet.update()
+        for (let i = 0; i < this.bullets.length; i++) {
+            this.bullets[i].update()
+            if (!this.bullets[i].exists) {
+                this.bullets[i].mesh.delete()
+                this.bullets.splice(i, 1)
+                i--
+            }
         }
 
         this.lsv -= 60 * delta

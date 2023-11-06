@@ -32,18 +32,12 @@ class Webgl {
 		uniform bool useAlphaMap;
 		uniform sampler2D uAlpha;
 
-        uniform float uvMul;
+        uniform float uAlpha2;
 		
 		out vec4 fragColour;
 		
 		void main() {
-
-            float uvM = uvMul;
-            if (uvM == 0.0) {
-                uvM = 1.0;
-            }
-
-            vec2 rUv = vec2(vUv.x*uvM - round(vUv.x*uvM-0.5), vUv.y*uvM - round(vUv.y*uvM-0.5));
+            vec2 rUv = vec2(vUv.x - round(vUv.x-0.5), vUv.y - round(vUv.y-0.5));
 			
 			vec4 colour = vColour;
 			if (useTexture) {
@@ -59,7 +53,7 @@ class Webgl {
 	 		if (alpha <= 0.0) {
 				discard;
 			}
-			fragColour = vec4(colour.r, colour.g, colour.b, alpha);
+			fragColour = vec4(colour.r, colour.g, colour.b, alpha*uAlpha2);
 		}
 	`
 	vertexShaderGL
@@ -106,7 +100,7 @@ class Webgl {
 			texture: gl.getUniformLocation(this.program, "uTexture"),
 			useAlphaMap: gl.getUniformLocation(this.program, "useAlphaMap"),
 			alpha: gl.getUniformLocation(this.program, "uAlpha"),
-			uvMul: gl.getUniformLocation(this.program, "uvMul"),
+			alpha2: gl.getUniformLocation(this.program, "uAlpha2"),
 		}
 
 		this.modelBuffer = gl.createBuffer()
@@ -226,7 +220,7 @@ class Webgl {
 			customRotOff = []
 			ignoreFog = false
 			originalFaces = []
-            uvMul = 1
+            alpha = 1
 			constructor(x, y, z, width, height, depth, vertices, faces, colours) {
 				this.pos = {x: x, y: y, z: z}
 				this.size = {x: width, y: height, z: depth}
@@ -400,7 +394,7 @@ class Webgl {
 					}
 				}
 				gl.uniformMatrix4fv(webgl.uniforms.model, false, model)
-                gl.uniform1f(webgl.uniforms.uvMul, this.uvMul)
+                gl.uniform1f(webgl.uniforms.alpha2, this.alpha)
 
 				gl.bindVertexArray(this.vao)
 
