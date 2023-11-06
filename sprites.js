@@ -67,7 +67,7 @@ class Bullet extends Object3D {
     }
     move(x, y, z, steps) {
         this.falling += delta
-        let f = 5
+        let f = 4
         for (let i = 0; i < steps; i++) {
             var lastX = this.pos.x
             this.pos.x += x / steps
@@ -112,16 +112,33 @@ class Explosion extends Object3D {
     vel = 0
     size2 = 0
     mesh
+    rv = {x: 0, y: 0, z: 0}
     constructor(x, y, z, force) {
         super(x, y, z, 0, 0, 0)
         this.vel = force
         this.mesh = new webgl.Box(x, y, z, 0, 0, 0, [0, 1, 1])
         this.mesh.alpha = 0.25
         this.mesh.order = true
+        this.mesh.rot.x = Math.random()*Math.PI*2
+        this.mesh.rot.y = Math.random()*Math.PI*2
+        this.mesh.rot.z = Math.random()*Math.PI*2
+
+        this.rv = {x:(Math.random()-0.5)*2 * Math.PI*2,y:(Math.random()-0.5)*2 * Math.PI*2,z:(Math.random()-0.5)*2 * Math.PI*2}
     }
     update() {
+        this.vel -= (1-0.9) * this.vel * delta * 100
         this.size2 += this.vel * delta
-        this.vel -= 50 * delta
+        this.mesh.alpha = this.vel
+        if (this.mesh.alpha > 0.5) {
+            this.mesh.alpha = 0.5
+        }
         this.mesh.size = {x: this.size2, y: this.size2, z: this.size2}
+        this.mesh.rotOff = {x: -this.size2/2, y: -this.size2/2, z: -this.size2/2}
+
+        this.mesh.rot.x += this.rv.x/4 * delta
+        this.mesh.rot.y += this.rv.y/4 * delta
+        this.mesh.rot.z += this.rv.z/4 * delta
+        // this.mesh.rot.y += Math.random()
+        // this.mesh.rot.z += Math.random()
     }
 }

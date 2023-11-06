@@ -178,7 +178,7 @@ function tick(timestamp) {
 
     for (let i = 0; i < explosions.length; i++) {
         explosions[i].update()
-        if (explosions[i].size2 < 0) {
+        if (explosions[i].mesh.alpha < 0.01) {
             explosions[i].mesh.delete()
             explosions.splice(i, 1)
             i--

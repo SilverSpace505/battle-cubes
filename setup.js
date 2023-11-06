@@ -9,7 +9,7 @@ var airFriction = 0.95
 var airSpeed = 0.085 * 120 
 var jump = 7
 
-var bounces = 5
+var bounces = 0
 var lifeTime = 1
 var spread = 0.01
 
