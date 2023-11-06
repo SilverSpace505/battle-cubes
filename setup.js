@@ -2,6 +2,11 @@
 var canvas = document.getElementById("canvas")
 var gl = canvas.getContext("webgl2", { antialias: false })
 
+var uCanvas = document.getElementById("uCanvas")
+var ctx = uCanvas.getContext("2d")
+
+var webgl = new Webgl()
+
 var gravity = 0.3 * 60
 var speed = 250
 var friction = 0.5	 
@@ -12,6 +17,19 @@ var jump = 7
 var bounces = 0
 var lifeTime = 1
 var spread = 0.01
+
+var view = mat4.create()
+const projection = mat4.create()
+
+var camera = {pos: {x: 0, y: 0, z: 0}, rot: {x: 0, y: -Math.PI/2-Math.PI*1000, z: 0}}
+
+var grassTexture = new webgl.Texture("assets/grass.png")
+var boxTexture = new webgl.Texture("assets/box.png")
+var woodTexture = new webgl.Texture("assets/wood.png")
+var stoneTexture = new webgl.Texture("assets/stone.png")
+var leavesTexture = new webgl.Texture("assets/leaves.png")
+
+var bgImg = new Image(); bgImg.src = "assets/bg.png"
 
 function rotVec(vec, rx, ry, rz) {
     // Rotation around Z-axis

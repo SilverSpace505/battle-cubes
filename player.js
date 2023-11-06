@@ -29,19 +29,19 @@ class Player extends Object3D {
 
         let moveDir = {x: 0, z: 0}
 
-        if (keys["KeyW"]) {
+        if (keys["KeyW"] && !paused) {
             moveDir.x -= Math.sin(camera.rot.y)
             moveDir.z -= Math.cos(camera.rot.y)
         }
-        if (keys["KeyS"]) {
+        if (keys["KeyS"] && !paused) {
             moveDir.x += Math.sin(camera.rot.y)
             moveDir.z += Math.cos(camera.rot.y)
         }
-        if (keys["KeyA"]) {
+        if (keys["KeyA"] && !paused) {
             moveDir.x -= Math.cos(camera.rot.y)
             moveDir.z += Math.sin(camera.rot.y)
         }
-        if (keys["KeyD"]) {
+        if (keys["KeyD"] && !paused) {
             moveDir.x += Math.cos(camera.rot.y)
             moveDir.z -= Math.sin(camera.rot.y)
         }
@@ -68,7 +68,7 @@ class Player extends Object3D {
         }
         this.move(this.vel.x * delta, this.vel.y * delta, this.vel.z * delta, 1/delta)
 
-        if (mouse.lclick) {
+        if (mouse.lclick && isValid) {
             this.lsv = 6
             this.laserShooter.rot.x = 0
             let rotated = rotVec({x:0, y:0, z:-1*100}, camera.rot.x + (Math.random()-0.5)*2*spread, camera.rot.y + (Math.random()-0.5)*2*spread, camera.rot.z + (Math.random()-0.5)*2*spread)

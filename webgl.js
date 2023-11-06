@@ -626,5 +626,3 @@ class Webgl {
 		}
 	}
 }
-
-var webgl = new Webgl()
