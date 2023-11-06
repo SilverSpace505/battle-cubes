@@ -137,6 +137,11 @@ function tick(timestamp) {
 
     input.setGlobals()
 
+    if (mouse.lclick && !input.isMouseLocked()) {
+        input.lockMouse()
+        mouse.lclick = false
+    }
+
     test.pos.y = Math.sin(time)*0.25 + 1
 
     testG[0].rot.x += 0.01
@@ -169,10 +174,6 @@ function tick(timestamp) {
 
     if (jKeys["Escape"] || jKeys["Tab"]) {
         input.unlockMouse()
-    }
-
-    if (mouse.lclick) {
-        input.lockMouse()
     }
 
     for (let i = 0; i < explosions.length; i++) {
