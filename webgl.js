@@ -559,6 +559,38 @@ class Webgl {
 			}
 		}
 	}
+	get Group() {
+		return class {
+			pos = {x: 0, y: 0, z: 0}
+			size = {x: 1, y: 1, z: 1}
+			rot = {x: 0, y: 0, z: 0}
+			meshes = []
+			constructor(x, y, z, meshes=[]) {
+				this.pos = {x:x, y:y, z:z}
+				this.meshes = meshes
+			}
+			update() {
+				for (let mesh of this.meshes) {
+					mesh.oldPos = {...mesh.pos}
+					mesh.oldRot = {...mesh.rot}
+					let rotated = rotVec(mesh.pos, this.rot.x, this.rot.y, this.rot.z)
+					mesh.pos = {x:rotated.x+this.pos.x, y:rotated.y+this.pos.y, z:rotated.z+this.pos.z}
+					mesh.rot = {...this.rot}
+					mesh.customRot = [
+						["Y", mesh.oldRot.y],
+						["X", mesh.oldRot.x],
+						["Y", mesh.oldRot.z],
+					]
+				}
+			}
+			aRender() {
+				for (let mesh of this.meshes) {
+					mesh.pos = {...mesh.oldPos}
+					mesh.rot = {...mesh.oldRot}
+				}
+			}
+		}
+	}
 }
 
 var webgl = new Webgl()

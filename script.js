@@ -46,6 +46,8 @@ function createBox(x, y, z, width, height, depth, colour, texture="none", doScal
         newBox.updateBuffers()
     }
 
+    newBox.rotOff = {x:-newBox.size.x/2, y:-newBox.size.y/2, z:-newBox.size.z/2}
+
     return newBox
 }
 
@@ -96,7 +98,20 @@ tree(0, 0, 10, 0)
 tree(1, 0, 8, 1000)
 tree(-1, 0, 9, 2000)
 
+let testG = []
+let ts = 0.2
+testG.push(createBox(-0.5, 0, 0, ts, ts, ts, [1, 0, 0]))
+testG.push(createBox(0.5, 0, 0, ts, ts, ts, [1, 0, 0]))
+testG.push(createBox(0, -0.5, 0, ts, ts, ts, [0, 1, 0]))
+testG.push(createBox(0, 0.5, 0, ts, ts, ts, [0, 1, 0]))
+testG.push(createBox(0, 0, -0.5, ts, ts, ts, [0, 0, 1]))
+testG.push(createBox(0, 0, 0.5, ts, ts, ts, [0, 0, 1]))
+
+var test = new webgl.Group(0, 1, -5, testG)
+
 var player = new Player(0, 1, 0)
+
+var time = 0
 
 function tick(timestamp) {
     requestAnimationFrame(tick)
@@ -112,7 +127,18 @@ function tick(timestamp) {
 	if (!delta) { delta = 0 }
 	if (delta > 0.1) { delta = 0.1 }
 
+    time += delta
+
     input.setGlobals()
+
+    test.pos.y = Math.sin(time)*0.25 + 1
+
+    testG[0].rot.x += 0.01
+    testG[1].rot.x += 0.01
+
+    test.rot.y += 0.01
+
+    test.update()
 
     player.update()
     camera.pos = {x:player.pos.x, y:player.pos.y+0.5, z:player.pos.z}
@@ -142,6 +168,8 @@ function tick(timestamp) {
 	mat4.perspective(projection, fov * Math.PI / 180, gl.canvas.width / gl.canvas.height, 0.01, 5000)
 
 	webgl.render()
+
+    test.aRender()
 
     input.updateInput()
 }

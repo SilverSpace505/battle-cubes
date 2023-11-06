@@ -1,8 +1,18 @@
 
 class Player extends Object3D {
     vel = {x: 0, y: 0, z: 0}
+    laserShooter = []
     constructor(x, y, z) {
         super(x, y, z, 0.5, 1.9, 0.5)
+
+        this.clsb(0, 1-0.875, 0, 0.2, 0.3, 0.8, [1, 1, 1])
+        this.clsb(0, 0.7-0.875, 0.3, 0.2, 0.3, 0.2, [1, 1, 1])
+        this.clsb(0, 0.8-0.875, 0.1, 0.5, 0.15, 0.15, [0, 1, 1])
+        this.clsb(0, 1.05-0.875, -0.4, 0.1, 0.1, 0.2, [0, 1, 1])
+        this.clsb(0, 0.95-0.875, -0.4, 0.05, 0.05, 0.1, [0, 1, 1])
+    }
+    clsb(x, y, z, width, height, depth, colour, rx=0, ry=0, rz=0) /* create laser shooter box */ {
+        this.laserShooter.push([[x, y, z, rx, ry, rz], new webgl.Box(x, y, z, width, height, depth, colour)])
     }
     update() {
         if (keys["KeyW"]) {
@@ -28,6 +38,17 @@ class Player extends Object3D {
         this.vel.z *= 0.5
         this.vel.y -= gravity * delta
         this.move(this.vel.x * delta, this.vel.y * delta, this.vel.z * delta, 1/delta)
+
+        while (this.checkCollide()) {
+            this.pos.y += 0.01
+        }
+
+        for (let part of this.laserShooter) {
+            let rotated = rotVec({x: part[0][0]+0.5, y: part[0][1], z: part[0][2]-1}, camera.rot.x, camera.rot.y, 0)
+            part[1].pos = {x: this.pos.x + rotated.x, y: this.pos.y + rotated.y, z: this.pos.z + rotated.z}
+            part[1].rotOff = {x:-part[1].size.x/2, y:-part[1].size.y/2, z:-part[1].size.z/2}
+            part[1].rot = {x:part[0][3] + camera.rot.x, y:part[0][4] + camera.rot.y, z:part[0][5]}
+        }
     }
     checkCollide() {
         return this.isColliding(boxes)
