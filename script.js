@@ -136,6 +136,12 @@ function tick(timestamp) {
     testG[0].rot.x += 0.01
     testG[1].rot.x += 0.01
 
+    testG[2].rot.y += 0.01
+    testG[3].rot.y += 0.01
+
+    testG[4].rot.z += 0.01
+    testG[5].rot.z += 0.01
+
     test.rot.y += 0.01
 
     test.update()
