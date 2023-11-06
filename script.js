@@ -149,6 +149,11 @@ function tick(timestamp) {
     player.update()
     camera.pos = {x:player.pos.x, y:player.pos.y+0.5, z:player.pos.z}
 
+    player.lso.pos = {...camera.pos}
+    player.lso.rot = {...camera.rot}
+    player.lso.update()
+    player.laserShooter.update()
+
     if (jKeys["Escape"] || jKeys["Tab"]) {
         input.unlockMouse()
     }
@@ -166,16 +171,21 @@ function tick(timestamp) {
 
 	gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
 	gl.clearColor(0.529, 0.808, 0.922, 1)
-	gl.clear(gl.COLOR_BUFFER_BIT)
+    gl.clear(gl.STENCIL_BUFFER_BIT | gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 	gl.enable(gl.DEPTH_TEST)
 
 	gl.enable(gl.BLEND)
-	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
+	gl.clear(gl.STENCIL_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 	mat4.perspective(projection, fov * Math.PI / 180, gl.canvas.width / gl.canvas.height, 0.01, 5000)
+
+    gl.enable(gl.DEPTH_TEST)
+    gl.enable(gl.STENCIL_TEST)
 
 	webgl.render()
 
     test.aRender()
+    player.laserShooter.aRender()
+    player.lso.aRender()
 
     input.updateInput()
 }

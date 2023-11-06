@@ -73,6 +73,7 @@ class Webgl {
 	updateProjection = true
 	rDistance = 0
 	modelBuffer
+	ri = 0
 
 	constructor() {
 		this.vertexShaderGL = gl.createShader(gl.VERTEX_SHADER)
@@ -137,9 +138,11 @@ class Webgl {
 			this.sortCooldown = 30
 			this.sortObjs()
 		}
+		this.ri = 0
 		for (let mesh of this.meshes) {
 			if (this.doRender) {
 				mesh.render()
+				this.ri++
 			}
 		}
 	}
@@ -360,11 +363,15 @@ class Webgl {
 				}
 
 				if (this.ignoreDepth) {
-					gl.disable(gl.DEPTH_TEST)
-					gl.depthMask(false)
+					// gl.disable(gl.DEPTH_TEST)
+					// gl.depthMask(false)
 					mat4.perspective(projection, 60 * Math.PI/180, gl.canvas.width / gl.canvas.height, 0.01, 5000)
 					webgl.update()
+					gl.stencilFunc(gl.EQUAL, 1, 0xFF)
+					gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP)
 				} else {
+					gl.stencilFunc(gl.ALWAYS, 1, 0xFF)
+					gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE)
 					// gl.enable(gl.DEPTH_TEST)
 					// gl.depthMask(true)
 				}
@@ -376,9 +383,9 @@ class Webgl {
 					gl.disable(gl.CULL_FACE)
 				}
 				
-				this.orderCooldown -= 1
+				this.orderCooldown -= delta
 				if (this.order && this.orderCooldown <= 0) {
-					this.orderCooldown = fps
+					this.orderCooldown = 1
 					this.orderFaces()
 				}
 				let model = this.getModel()
@@ -429,7 +436,7 @@ class Webgl {
 			lastColour = []
 			colour = [0, 0, 0]
 			visible = true
-			constructor(x, y, z, width, height, depth, colour) {
+			constructor(x, y, z, width, height, depth, colour, centerRot=true) {
 				super(x, y, z, width, height, depth, [
 					// +X
 					1, 1, 1,
@@ -483,6 +490,9 @@ class Webgl {
 				])
 				this.oneSide = true
 				this.colour = colour
+				if (centerRot) {
+					this.rotOff = {x: -width/2, y: -height/2, z: -depth/2}
+				}
 			}
 			updateShape(o=0) {
 				this.vertices = [
@@ -564,6 +574,8 @@ class Webgl {
 			pos = {x: 0, y: 0, z: 0}
 			size = {x: 1, y: 1, z: 1}
 			rot = {x: 0, y: 0, z: 0}
+			isChild = false
+			customRot = []
 			meshes = []
 			constructor(x, y, z, meshes=[]) {
 				this.pos = {x:x, y:y, z:z}
@@ -574,19 +586,26 @@ class Webgl {
 					mesh.oldPos = {...mesh.pos}
 					mesh.oldRot = {...mesh.rot}
 					let rotated = rotVec(mesh.pos, this.rot.x, this.rot.y, this.rot.z)
+					if (this.isChild) {
+						rotated = rotVec(mesh.pos, this.oldRot.x+this.rot.x, this.oldRot.y+this.rot.y, this.oldRot.z+this.rot.z)
+					}
 					mesh.pos = {x:rotated.x+this.pos.x, y:rotated.y+this.pos.y, z:rotated.z+this.pos.z}
 					mesh.rot = {...this.rot}
-					mesh.customRot = [
+					mesh.customRot.push(...this.customRot)
+					mesh.customRot.push(
 						["Y", mesh.oldRot.y],
 						["X", mesh.oldRot.x],
 						["Y", mesh.oldRot.z],
-					]
+					)
+					mesh.isChild = true
 				}
 			}
 			aRender() {
 				for (let mesh of this.meshes) {
 					mesh.pos = {...mesh.oldPos}
 					mesh.rot = {...mesh.oldRot}
+					mesh.customRot = []
+					mesh.isChild = false
 				}
 			}
 		}
