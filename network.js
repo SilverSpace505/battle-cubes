@@ -48,7 +48,9 @@ function connectToServer() {
             // console.log("Got some lobbies: " + JSON.stringify(msg.lobbies))
         }
         if (msg.lobbyData && passType <= 0) {
-            lobbyData = msg.lobbyData[1]
+            if (msg.lobbyData[1]) {
+                lobbyData = msg.lobbyData[1]
+            }
         }
         if (msg.joinedLobby) {
             lobbyLoading = false
