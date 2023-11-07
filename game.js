@@ -289,7 +289,7 @@ function gameTick() {
             }
         }
 
-        if (lobbyData.host == id) {
+        if (lobbbyData && lobbyData.host == id) {
             lobbyOButton.set(canvas.width/2, canvas.height/2+110*su, 400*su, 100*su)
             lobbyOButton.textSize = 50*su
             lobbyOButton.draw()
