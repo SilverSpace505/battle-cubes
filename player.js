@@ -73,7 +73,7 @@ class Player extends Object3D {
             this.laserShooter.rot.x = 0
             let rotated = rotVec({x:0, y:0, z:-1*100*bulletSpeed}, camera.rot.x + (Math.random()-0.5)*2*spread, camera.rot.y + (Math.random()-0.5)*2*spread, camera.rot.z + (Math.random()-0.5)*2*spread)
             this.bullets.push(new Bullet(camera.pos.x, camera.pos.y, camera.pos.z, rotated.x, rotated.y, rotated.z, bulletSize, bounces, lifeTime, drag, colour))
-            sendMsg({bullet: [camera.pos.x, camera.pos.y, camera.pos.z, rotated.x, rotated.y, rotated.z, bulletSize, bounces, lifeTime]})
+            sendMsg({bullet: [camera.pos.x, camera.pos.y, camera.pos.z, rotated.x, rotated.y, rotated.z, bulletSize, bounces, lifeTime, drag, colour]})
         }
 
         for (let i = 0; i < this.bullets.length; i++) {

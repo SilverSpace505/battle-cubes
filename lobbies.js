@@ -23,6 +23,7 @@ function lobbiesTick() {
     }
     
     cLobbyName.set(canvas.width/2 + 10*su + 450*su/2, canvas.height/2 - 75*su, 450*su, 50*su)
+    cLobbyName.outlineSize = 10*su
 
     cLobbyName.hover()
     cLobbyName.draw()
