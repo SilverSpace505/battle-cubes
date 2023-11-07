@@ -47,6 +47,7 @@ class Bullet extends Object3D {
     size2 = 0
     drag = 0
     colour = [0, 1, 1]
+    real = false
     constructor(x, y, z, vx, vy, vz, size, maxBounces, lifeTime, drag, colour) {
         super(x, y, z, size, size, size*2)
         this.vel = {x:vx, y:vy, z:vz}
@@ -75,6 +76,14 @@ class Bullet extends Object3D {
         if (this.time > this.lifeTime || this.bounces > this.maxBounces) {
             this.exists = false
         }
+        
+        if (this.real) {
+            for (let player in players) {
+                if (this.isColliding([players[player]])) {
+                    sendMsg({hit: player})
+                }
+            }
+        }
     }
     checkCollide() {
         return this.isColliding(boxes)
@@ -94,6 +103,13 @@ class Bullet extends Object3D {
                 }
                 this.bounces += 1
                 explosions.push(new Explosion(this.pos.x, this.pos.y, this.pos.z, f, this.colour))
+                if (this.real) {
+                    for (let player in players) {
+                        if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, players[player].pos.x, players[player].pos.y, players[player].pos.z, players[player].size.x, players[player].size.y, players[player].size.z)) {
+                            sendMsg({hit: player})
+                        }
+                    }
+                }
                 return
             }
             var lastZ = this.pos.z
@@ -103,6 +119,13 @@ class Bullet extends Object3D {
                 this.vel.z *= -1
                 this.bounces += 1
                 explosions.push(new Explosion(this.pos.x, this.pos.y, this.pos.z, f, this.colour))
+                if (this.real) {
+                    for (let player in players) {
+                        if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, players[player].pos.x, players[player].pos.y, players[player].pos.z, players[player].size.x, players[player].size.y, players[player].size.z)) {
+                            sendMsg({hit: player})
+                        }
+                    }
+                }
                 return
             }
             var lastY = this.pos.y
@@ -115,6 +138,13 @@ class Bullet extends Object3D {
                 }
                 this.bounces += 1
                 explosions.push(new Explosion(this.pos.x, this.pos.y, this.pos.z, f, this.colour))
+                if (this.real) {
+                    for (let player in players) {
+                        if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, players[player].pos.x, players[player].pos.y, players[player].pos.z, players[player].size.x, players[player].size.y, players[player].size.z)) {
+                            sendMsg({hit: player})
+                        }
+                    }
+                }
                 return
                 // this.vel.y = 0
             }

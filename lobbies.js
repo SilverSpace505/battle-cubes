@@ -62,7 +62,7 @@ function lobbiesTick() {
     }
     cLobbyName.draw()
 
-    createLobbyButton.set(canvas.width/2 + 10*su + 450*su/2, canvas.height/2 + 37.5 - 150*su, 450*su, 75*su)
+    createLobbyButton.set(canvas.width/2 + 10*su + 450*su/2, canvas.height/2 + 37.5*su - 150*su, 450*su, 75*su)
     createLobbyButton.textSize = 50*su
 
     if (!passUI) {
