@@ -42,30 +42,47 @@ function connectToServer() {
 		}
         if (msg.lobbies) {
             lobbies = msg.lobbies
+            // if (lobby) {
+            //     lobbyData = lobbies[lobby]
+            // }
             // console.log("Got some lobbies: " + JSON.stringify(msg.lobbies))
+        }
+        if (msg.lobbyData && passType <= 0) {
+            lobbyData = msg.lobbyData[1]
         }
         if (msg.joinedLobby) {
             lobbyLoading = false
             lobby = msg.joinedLobby
-            console.log("Joined lobby: " + lobby)
+            showM("Joined lobby: " + lobby)
             tScene = "game"
             overlayT = 1
             player.pos = {x: 0, y: 1, z: 0}
             uiA = 0
             camera.rot = {x: 0, y: -Math.PI/2-Math.PI*1000, z: 0}
             input.lockMouse()
+            passwordTo.text = ""
+            passUI = false
+            sendMsg({getLobby: true})
         }
         if (msg.lobbyExists) {
             lobbyLoading = false
-            console.log("Lobby already exists! " + msg.lobbyExists)
+            showM("Lobby already exists")
         }
         if (msg.lobbyDoesNotExist) {
             lobbyLoading = false
-            console.log("Lobby does not exist! " + msg.lobbyDoesNotExist)
+            showM("Lobby does not exist")
         }
         if (msg.notHost) {
             lobbyLoading = false
-            console.log("You are not the host! " + msg.notHost)
+            showM("You are not the host")
+        }
+        if (msg.wrongPassword) {
+            lobbyLoading = false
+            if (!passUI) {
+                passUI = true
+            } else {
+                showM("Wrong Password")
+            }
         }
         if (msg.data) {
             playerData = msg.data

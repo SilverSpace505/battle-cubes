@@ -8,6 +8,8 @@ var tFov = 60
 var uiA = 0
 var uiT = 0
 
+var page = "main"
+
 function srand(seed) {
     seed += 748473
     return (Math.sin(seed*482032832)+1)/2
@@ -15,6 +17,19 @@ function srand(seed) {
 
 var menuButton = new ui.Button(0, 0, 0, 0, "rect", "Menu")
 menuButton.bgColour = [0, 0, 0, 0.5]
+
+var lobbyOButton = new ui.Button(0, 0, 0, 0, "rect", "Lobby Options")
+lobbyOButton.bgColour = [0, 0, 0, 0.5]
+
+var loBackButton = new ui.Button(0, 0, 0, 0, "rect", "Back")
+loBackButton.bgColour = [255, 0, 0, 0.5]
+
+var privateButton = new ui.Button(0, 0, 0, 0, "rect", "Public")
+privateButton.bgColour = [0, 0, 0, 0.5]
+
+var passwordTo = new ui.TextBox(0, 0, 0, 0, "Password")
+
+var passType = 0
 
 function createBox(x, y, z, width, height, depth, colour, texture="none", doScale=true, uvMul=1) {
     let newBox = new webgl.Box(x, y, z, width, height, depth, colour)
@@ -117,6 +132,8 @@ var paused = false
 
 var players = {}
 
+var oldPass = ""
+
 function gameTick() {
     time += delta
 
@@ -133,8 +150,9 @@ function gameTick() {
         }
     }
 
-    isValid = !(Math.abs(mouse.x-canvas.width/2) < 225*su && Math.abs(mouse.y-canvas.height/2) < 200*su) || input.isMouseLocked()
-
+    
+    isValid = !(Math.abs(mouse.x-canvas.width/2) < 300*su && Math.abs(mouse.y-canvas.height/2) < 250*su) || input.isMouseLocked()
+    
     if (mouse.lclick && isValid && !input.isMouseLocked()) {
         input.lockMouse()
         mouse.lclick = false
@@ -152,6 +170,8 @@ function gameTick() {
     testG[5].rot.z += 0.01
 
     test.rot.y += 0.01
+
+    passType -= delta
 
     test.update()
 
@@ -233,6 +253,11 @@ function gameTick() {
         paused = true
     }
 
+    if (fetchC <= 0) {
+        fetchC = 3
+        sendMsg({getLobby: true})
+    }
+
     uiA += (uiT - uiA) * delta * 10
 
     ctx.globalAlpha = 1-uiA
@@ -240,24 +265,93 @@ function gameTick() {
     ui.rect(canvas.width/2, canvas.height/2, 2.5, 25, [255, 255, 255, 1])
 
     ctx.globalAlpha = uiA
-    ui.rect(canvas.width/2, canvas.height/2, 450*su, 400*su, [0, 0, 0, 0.5])
 
-    ui.text(canvas.width/2, canvas.height/2-125*su, 75*su, "Paused", {align: "center"})
-    
-    menuButton.set(canvas.width/2, canvas.height/2, 400*su, 100*su)
-    menuButton.textSize = 75*su
-    menuButton.draw()
+    if (page == "lobbyO" && lobbyData.host != id) {
+        page = "main"
+    }
 
-    if (uiT == 1) {
-        menuButton.basic()
-        if (menuButton.hovered() && mouse.lclick && overlayT == 0) {
-            menuButton.click()
-            tScene = "menu"
-            overlayT = 1
-            sendMsg({leaveLobby: true})
+    if (page == "main") {
+        ui.rect(canvas.width/2, canvas.height/2, 450*su, 400*su, [0, 0, 0, 0.5])
+
+        ui.text(canvas.width/2, canvas.height/2-125*su, 75*su, "Paused", {align: "center"})
+        
+        menuButton.set(canvas.width/2, canvas.height/2, 400*su, 100*su)
+        menuButton.textSize = 75*su
+        menuButton.draw()
+
+        if (uiT == 1) {
+            menuButton.basic()
+            if (menuButton.hovered() && mouse.lclick && overlayT == 0) {
+                menuButton.click()
+                tScene = "menu"
+                overlayT = 1
+                sendMsg({leaveLobby: true})
+            }
+        }
+
+        if (lobbyData.host == id) {
+            lobbyOButton.set(canvas.width/2, canvas.height/2+110*su, 400*su, 100*su)
+            lobbyOButton.textSize = 50*su
+            lobbyOButton.draw()
+
+            lobbyOButton.basic()
+
+            if (lobbyOButton.hovered() && mouse.lclick) {
+                page = "lobbyO"
+            }
+        }
+    } else if (page == "lobbyO") {
+        ui.rect(canvas.width/2, canvas.height/2, 600*su, 500*su, [0, 0, 0, 0.5])
+        ui.text(canvas.width/2, canvas.height/2-200*su, 50*su, "Lobby Options", {align: "center"})
+
+        loBackButton.set(canvas.width/2, canvas.height/2+200*su, 400*su, 50*su)
+        loBackButton.textSize = 35*su
+
+        loBackButton.basic()
+        loBackButton.draw()
+
+        if (loBackButton.hovered() && mouse.lclick) {
+            loBackButton.click()
+            page = "main"
+        }
+
+        privateButton.set(canvas.width/2, canvas.height/2 - 30*su, 400*su, 50*su)
+        privateButton.textSize = 35*su
+
+        if (lobbyData.private) {
+            privateButton.text = "Private"
+        } else {
+            privateButton.text = "Public"
+        }
+        
+        privateButton.basic()
+        privateButton.draw()
+
+        if (privateButton.hovered() && mouse.lclick) {
+            privateButton.click()
+            lobbyData.private = !lobbyData.private
+            sendMsg({setOptions: {private: lobbyData.private}})
+        }
+
+        passwordTo.set(canvas.width/2, canvas.height/2 + 30*su, 400*su, 50*su)
+        passwordTo.outlineSize = 10*su
+        passwordTo.textSize = 35*su
+
+        passwordTo.text = passwordTo.text.substring(0, 10)
+
+        passwordTo.hover()
+        passwordTo.draw()
+
+        if (passwordTo.text != oldPass) {
+            lobbyData.password = passwordTo.text
+            passType = 1
+            sendMsg({setOptions: {password: passwordTo.text}})
         }
     }
 
+    passwordTo.text = lobbyData.password
+    oldPass = lobbyData.password
+    
     ctx.globalAlpha = 1
 
     data = {

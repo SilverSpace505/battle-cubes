@@ -30,6 +30,13 @@ function menuTick() {
     if (playButton.hovered() && mouse.lclick && overlayT == 0) {
         playButton.click()
         tScene = "lobbies"
+        messageA = 0
+        sm = 0
         overlayT = 1
+        passTo.text = ""
+        cLobbyName.text = ""
+        privateTo.text = ""
+        passUI = false
+        passA = 0
     }
 }

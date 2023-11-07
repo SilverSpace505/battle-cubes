@@ -33,6 +33,7 @@ var leavesTexture = new webgl.Texture("assets/leaves.png")
 
 var bgImg = new Image(); bgImg.src = "assets/bg.png"
 var peopleImg = new Image(); peopleImg.src = "assets/people.png"
+var keyImg = new Image(); keyImg.src = "assets/key.png"
 
 function rotVec(vec, rx, ry, rz) {
     // Rotation around Z-axis

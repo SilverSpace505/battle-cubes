@@ -79,4 +79,27 @@ input.mouseMove = (event) => {
     }
 }
 
+input.checkInputs = (event) => {
+    if (input.focused) {
+		input.focused.focused = false
+		input.focused = null
+	}
+
+    if (scene == "lobbies") {
+        if (passUI) {
+            passTo.checkFocus(event)
+        } else {
+            cLobbyName.checkFocus(event)
+            privateTo.checkFocus(event)
+        }
+    } else if (scene == "game" && page == "lobbyO") {
+        passwordTo.checkFocus(event)
+    }
+	
+
+	if (!input.focused) {
+		input.getInput.blur()
+	}
+}
+
 requestAnimationFrame(tick)
