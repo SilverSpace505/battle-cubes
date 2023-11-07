@@ -115,8 +115,23 @@ var isValid = false
 
 var paused = false
 
+var players = {}
+
 function gameTick() {
     time += delta
+
+    for (let player in players) {
+        if (!playerData[player]) {
+            players[player].delete()
+            delete players[player]
+        }
+    }
+
+    for (let player in playerData) {
+        if (!players[player] && player != id) {
+            players[player] = new webgl.Box(0, 0, 0, 0.5, 1.9, 0.5, [0, 0.5, 1])
+        }
+    }
 
     isValid = !(Math.abs(mouse.x-canvas.width/2) < 225*su && Math.abs(mouse.y-canvas.height/2) < 200*su) || input.isMouseLocked()
 
@@ -177,6 +192,12 @@ function gameTick() {
         }
     }
 
+    for (let player in players) {
+        players[player].pos.x += (playerData[player].x - players[player].pos.x) * delta * 15
+        players[player].pos.y += (playerData[player].y - players[player].pos.y) * delta * 15
+        players[player].pos.z += (playerData[player].z - players[player].pos.z) * delta * 15
+    }
+
     view = mat4.create()
 	mat4.translate(view, view, [camera.pos.x, camera.pos.y, camera.pos.z])
 	mat4.rotateY(view, view, camera.rot.y)
@@ -233,8 +254,15 @@ function gameTick() {
             menuButton.click()
             tScene = "menu"
             overlayT = 1
+            sendMsg({leaveLobby: true})
         }
     }
 
     ctx.globalAlpha = 1
+
+    data = {
+        x: player.pos.x,
+        y: player.pos.y,
+        z: player.pos.z,
+    }
 }

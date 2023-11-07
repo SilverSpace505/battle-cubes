@@ -34,7 +34,14 @@ requestAnimationFrame(tick)
 	if (!delta) { delta = 0 }
 	if (delta > 0.1) { delta = 0.1 }
 
+    fetchC -= delta
+
     input.setGlobals()
+
+    if (scene == "game" && !lobby && overlayT == 0) {
+        overlayT = 1
+        tScene = "menu"
+    }
 
     if (scene == "game") {
         gameTick()

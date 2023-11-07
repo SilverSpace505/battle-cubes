@@ -3,7 +3,20 @@ var playButton = new ui.Button(0, 0, 0, 0, "rect", "Play")
 playButton.bgColour = [0, 0, 0, 0.5]
 
 function menuTick() {
-    ui.img(canvas.width/2, canvas.height/2, canvas.width, canvas.height, bgImg)
+    let aspect = 2906/1621
+    let bgSize = {x: canvas.height*aspect, y: canvas.width/aspect}
+    if (canvas.width > bgSize.x) {
+        bgSize.x = canvas.width
+    }
+    if (canvas.height > bgSize.y) {
+        bgSize.y = canvas.height
+    }
+    ui.img(canvas.width/2, canvas.height/2, bgSize.x, bgSize.y, bgImg)
+
+    if (scene == "lobbies") {
+        lobbiesTick()
+        return
+    }
 
     ui.text(canvas.width/2, 100*su, 100*su, "FPS Game", {align: "center"})
 
@@ -16,11 +29,7 @@ function menuTick() {
 
     if (playButton.hovered() && mouse.lclick && overlayT == 0) {
         playButton.click()
-        tScene = "game"
+        tScene = "lobbies"
         overlayT = 1
-        player.pos = {x: 0, y: 1, z: 0}
-        uiA = 0
-        camera.rot = {x: 0, y: -Math.PI/2-Math.PI*1000, z: 0}
-        input.lockMouse()
     }
 }

@@ -42,12 +42,26 @@ class Bullet extends Object3D {
     exists = true
     time = 0
     bounces = 0
-    constructor(x, y, z, vx, vy, vz, size) {
+    maxBounces = 0
+    lifeTime = 0
+    size2 = 0
+    drag = 0
+    colour = [0, 1, 1]
+    constructor(x, y, z, vx, vy, vz, size, maxBounces, lifeTime, drag, colour) {
         super(x, y, z, size, size, size*2)
         this.vel = {x:vx, y:vy, z:vz}
-        this.mesh = new webgl.Box(x, y, z, size/2, size*2, size/2, [0, 1, 1])
+        this.mesh = new webgl.Box(x, y, z, size/2, size*2, size/2, colour)
+        this.maxBounces = maxBounces
+        this.lifeTime = lifeTime
+        this.size2 = size
+        this.colour = colour
+        this.drag = drag
     }
     update() {
+        this.vel.x -= this.drag * delta * this.vel.x * 100
+        this.vel.y -= this.drag * delta * this.vel.y * 100
+        this.vel.z -= this.drag * delta * this.vel.z * 100
+
         this.move(this.vel.x*delta, this.vel.y*delta, this.vel.z*delta, 1/delta)
         this.mesh.pos = {...this.pos}
 
@@ -58,7 +72,7 @@ class Bullet extends Object3D {
         this.mesh.rot = {...this.rot}
 
         this.time += delta
-        if (this.time > lifeTime || this.bounces > bounces) {
+        if (this.time > this.lifeTime || this.bounces > this.maxBounces) {
             this.exists = false
         }
     }
@@ -67,7 +81,7 @@ class Bullet extends Object3D {
     }
     move(x, y, z, steps) {
         this.falling += delta
-        let f = 4
+        let f = this.size2*10*4
         for (let i = 0; i < steps; i++) {
             var lastX = this.pos.x
             this.pos.x += x / steps
@@ -79,7 +93,7 @@ class Bullet extends Object3D {
                     this.pos.y -= 0.05
                 }
                 this.bounces += 1
-                explosions.push(new Explosion(this.pos.x, this.pos.y, this.pos.z, f))
+                explosions.push(new Explosion(this.pos.x, this.pos.y, this.pos.z, f, this.colour))
                 return
             }
             var lastZ = this.pos.z
@@ -88,7 +102,7 @@ class Bullet extends Object3D {
                 this.pos.z = lastZ
                 this.vel.z *= -1
                 this.bounces += 1
-                explosions.push(new Explosion(this.pos.x, this.pos.y, this.pos.z, f))
+                explosions.push(new Explosion(this.pos.x, this.pos.y, this.pos.z, f, this.colour))
                 return
             }
             var lastY = this.pos.y
@@ -100,7 +114,7 @@ class Bullet extends Object3D {
                     this.falling = 0
                 }
                 this.bounces += 1
-                explosions.push(new Explosion(this.pos.x, this.pos.y, this.pos.z, f))
+                explosions.push(new Explosion(this.pos.x, this.pos.y, this.pos.z, f, this.colour))
                 return
                 // this.vel.y = 0
             }
@@ -113,10 +127,10 @@ class Explosion extends Object3D {
     size2 = 0
     mesh
     rv = {x: 0, y: 0, z: 0}
-    constructor(x, y, z, force) {
+    constructor(x, y, z, force, colour) {
         super(x, y, z, 0, 0, 0)
         this.vel = force
-        this.mesh = new webgl.Box(x, y, z, 0, 0, 0, [0, 1, 1])
+        this.mesh = new webgl.Box(x, y, z, 0, 0, 0, colour)
         this.mesh.alpha = 0.25
         this.mesh.order = true
         this.mesh.rot.x = Math.random()*Math.PI*2

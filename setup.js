@@ -9,14 +9,16 @@ var webgl = new Webgl()
 
 var gravity = 0.3 * 60
 var speed = 250
-var friction = 0.5	 
-var airFriction = 0.95
-var airSpeed = 0.085 * 120 
 var jump = 7
 
 var bounces = 0
 var lifeTime = 1
 var spread = 0.01
+var bulletSize = 0.1
+var bulletSpeed = 1
+var colour = [0, 1, 1]
+var drag = 0
+var rapidFire = false
 
 var view = mat4.create()
 const projection = mat4.create()
@@ -30,6 +32,7 @@ var stoneTexture = new webgl.Texture("assets/stone.png")
 var leavesTexture = new webgl.Texture("assets/leaves.png")
 
 var bgImg = new Image(); bgImg.src = "assets/bg.png"
+var peopleImg = new Image(); peopleImg.src = "assets/people.png"
 
 function rotVec(vec, rx, ry, rz) {
     // Rotation around Z-axis
