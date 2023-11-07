@@ -86,6 +86,11 @@ class Bullet extends Object3D {
         }
     }
     checkCollide() {
+        for (let player in players) {
+            if (this.isColliding([players[player]])) {
+                return true
+            }
+        }
         return this.isColliding(boxes)
     }
     move(x, y, z, steps) {
