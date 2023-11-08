@@ -48,8 +48,10 @@ class Bullet extends Object3D {
     drag = 0
     colour = [0, 1, 1]
     real = false
-    constructor(x, y, z, vx, vy, vz, size, maxBounces, lifeTime, drag, colour) {
+    id = 0
+    constructor(id, x, y, z, vx, vy, vz, size, maxBounces, lifeTime, drag, colour) {
         super(x, y, z, size, size, size*2)
+	this.id = id
         this.vel = {x:vx, y:vy, z:vz}
         this.mesh = new webgl.Box(x, y, z, size/2, size*2, size/2, colour)
         this.maxBounces = maxBounces
@@ -87,7 +89,7 @@ class Bullet extends Object3D {
     }
     checkCollide() {
         for (let player in players) {
-            if (this.isColliding([players[player]])) {
+            if (player != this.id && this.isColliding([players[player]])) {
                 return true
             }
         }
