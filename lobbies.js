@@ -70,7 +70,7 @@ function lobbiesTick() {
     }
     createLobbyButton.draw()
     
-    if (createLobbyButton.hovered() && mouse.lclick && cLobbyName.text && !lobbyLoading && !passUI) {
+    if (createLobbyButton.hovered() && mouse.lclick && cLobbyName.text && !lobbyLoading && !passUI && connected) {
         createLobbyButton.click()
         lobbyLoading = true
         showM("Creating lobby called " + cLobbyName.text)
@@ -95,7 +95,7 @@ function lobbiesTick() {
     }
     joinLobbyButton2.draw()
     
-    if (joinLobbyButton2.hovered() && mouse.lclick && privateTo.text && !lobbyLoading && !passUI) {
+    if (joinLobbyButton2.hovered() && mouse.lclick && privateTo.text && !lobbyLoading && !passUI && connected) {
         joinLobbyButton2.click()
         lobbyLoading = true
         passLobby = privateTo.text
@@ -146,7 +146,7 @@ function lobbiesTick() {
             } else {
                 ui.rect(joinRect[0], joinRect[1], joinRect[2]*1.1, joinRect[3]*1.1, [0, 255, 0, 0.5])
             }
-            if (mouse.lclick && !lobbyLoading) {
+            if (mouse.lclick && !lobbyLoading && connected) {
                 lobbyLoading = true
                 passLobby = lobby
                 showM("Joining Lobby: " + lobby)

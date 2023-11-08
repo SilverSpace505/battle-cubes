@@ -49,9 +49,13 @@ class Bullet extends Object3D {
     colour = [0, 1, 1]
     real = false
     id = 0
-    constructor(id, x, y, z, vx, vy, vz, size, maxBounces, lifeTime, drag, colour) {
+    random = 0
+    homing = 0
+    id2 = 0
+    vel2 = [0, 0, 0]
+    constructor(id, id2, x, y, z, vx, vy, vz, size, maxBounces, lifeTime, drag, colour, random, homing, vel) {
         super(x, y, z, size, size, size*2)
-	this.id = id
+	    this.id = id
         this.vel = {x:vx, y:vy, z:vz}
         this.mesh = new webgl.Box(x, y, z, size/2, size*2, size/2, colour)
         this.maxBounces = maxBounces
@@ -59,12 +63,44 @@ class Bullet extends Object3D {
         this.size2 = size
         this.colour = colour
         this.drag = drag
+        this.random = random
+        this.homing = homing
+        this.id2 = id2
+        this.vel2 = vel
     }
     update() {
-        this.vel.x -= this.drag * delta * this.vel.x * 100
-        this.vel.y -= this.drag * delta * this.vel.y * 100
-        this.vel.z -= this.drag * delta * this.vel.z * 100
+        if (this.drag != 0) {
+            this.vel.x -= this.drag * delta * this.vel.x * 100
+            this.vel.y -= this.drag * delta * this.vel.y * 100
+            this.vel.z -= this.drag * delta * this.vel.z * 100
+        }
 
+        if (this.random != 0) {
+            this.vel.x += (srand(this.time*3+this.id2*5)-0.5)*2 * this.random * delta
+            this.vel.y += (srand(this.time*3+this.id2*5+1)-0.5)*2 * this.random * delta
+            this.vel.z += (srand(this.time*3+this.id2*5+2)-0.5)*2 * this.random * delta
+        }
+
+        if (this.homing != 0 && Object.keys(players).length > 0) {
+            let ds = []
+            for (let player in playerData) {
+                if (player != this.id) {
+                    ds.push([playerData[player], Math.sqrt((playerData[player].x-this.pos.x)**2 + (playerData[player].y-this.pos.y)**2 + (playerData[player].z-this.pos.z)**2)])
+                }
+            }
+            ds.sort((a, b) => (a[1] - b[1]))
+            let moveDir = {x: (ds[0][0].x-this.pos.x)/ds[0][1], y: (ds[0][0].y-this.pos.y)/ds[0][1], z: (ds[0][0].z-this.pos.z)/ds[0][1]}
+            this.vel.x += moveDir.x * this.homing * delta
+            this.vel.y += moveDir.y * this.homing * delta
+            this.vel.z += moveDir.z * this.homing * delta
+        }
+
+        if (this.vel2) {
+            this.vel.x += this.vel2[0] * delta
+            this.vel.y += this.vel2[1] * delta
+            this.vel.z += this.vel2[2] * delta
+        }
+        
         this.move(this.vel.x*delta, this.vel.y*delta, this.vel.z*delta, 1/delta)
         this.mesh.pos = {...this.pos}
 
@@ -169,7 +205,6 @@ class Explosion extends Object3D {
         this.vel = force
         this.mesh = new webgl.Box(x, y, z, 0, 0, 0, colour)
         this.mesh.alpha = 0.25
-        this.mesh.order = true
         this.mesh.rot.x = Math.random()*Math.PI*2
         this.mesh.rot.y = Math.random()*Math.PI*2
         this.mesh.rot.z = Math.random()*Math.PI*2

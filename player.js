@@ -5,24 +5,29 @@ class Player extends Object3D {
     lso // laser shooter origin
     lsv = 0
     bullets = []
+    mesh = []
+    ls = 0.5
     constructor(x, y, z) {
         super(x, y, z, 0.5, 0.5, 0.5)
+
+        this.mesh = new webgl.Box(0, 0, 0, 0.5, 0.5, 0.5, [0, 0.5, 1])
+
+        let ls = this.ls
         
         let laserShooterG = []
-        laserShooterG.push(new webgl.Box(0, 1.05-0.875, -0.4, 0.1, 0.1, 0.2, [0, 1, 1]))
-        laserShooterG.push(new webgl.Box(0, 0.95-0.875, -0.4, 0.05, 0.05, 0.1, [0, 1, 1]))
-        laserShooterG.push(new webgl.Box(0, 0.8-0.875, 0.1, 0.15, 0.15, 0.5, [0, 1, 1]))
-        laserShooterG.push(new webgl.Box(0, 0.7-0.875, 0.3, 0.2, 0.3, 0.2, [1, 1, 1]))
-        laserShooterG.push(new webgl.Box(0, 1-0.875, 0, 0.2, 0.3, 0.8, [1, 1, 1]))
+        laserShooterG.push(new webgl.Box(0*ls, (1.05-0.875)*ls, -0.4*ls, 0.1*ls, 0.1*ls, 0.2*ls, [0, 1, 1]))
+        laserShooterG.push(new webgl.Box(0*ls, (0.95-0.875)*ls, -0.4*ls, 0.05*ls, 0.05*ls, 0.1*ls, [0, 1, 1]))
+        laserShooterG.push(new webgl.Box(0*ls, (0.8-0.875)*ls, 0.1*ls, 0.15*ls, 0.15*ls, 0.5*ls, [0, 1, 1]))
+        laserShooterG.push(new webgl.Box(0*ls, (0.7-0.875)*ls, 0.3*ls, 0.2*ls, 0.3*ls, 0.2*ls, [1, 1, 1]))
+        laserShooterG.push(new webgl.Box(0*ls, (1-0.875)*ls, 0*ls, 0.2*ls, 0.3*ls, 0.8*ls, [1, 1, 1]))
         laserShooterG[2].rot.x = Math.PI/4
         for (let mesh of laserShooterG) {
             mesh.ignoreDepth = true
-            mesh.order = true
         }
-        this.laserShooter = new webgl.Group(0.65, -0.4, -1, laserShooterG)
+        this.laserShooter = new webgl.Group(0.65*ls, -0.4*ls, -1*ls, laserShooterG)
         this.lso = new webgl.Group(0, 0, 0, [this.laserShooter])
     }
-    spawn(range=10) {
+    spawn(range=20) {
         this.pos.x = (Math.random()-0.5)*2*range
         this.pos.y = 1
         this.pos.z = (Math.random()-0.5)*2*range
@@ -77,20 +82,58 @@ class Player extends Object3D {
         if ((mouse.lclick || (rapidFire && mouse.ldown)) && isValid) {
             this.lsv = 6
             this.laserShooter.rot.x = 0
-            let rotated = rotVec({x:0, y:0, z:-1*100*bulletSpeed}, camera.rot.x + (Math.random()-0.5)*2*spread, camera.rot.y + (Math.random()-0.5)*2*spread, camera.rot.z + (Math.random()-0.5)*2*spread)
-            this.bullets.push(new Bullet(id, camera.pos.x, camera.pos.y, camera.pos.z, rotated.x, rotated.y, rotated.z, bulletSize, bounces, lifeTime, drag, colour))
+            let initialAngle = [camera.rot.x + (Math.random()-0.5)*2*spread, camera.rot.y + (Math.random()-0.5)*2*spread, camera.rot.z]
+            let rotated = rotVec({x: 0.65*this.ls, y: -0.4*this.ls, z: -1*this.ls}, camera.rot.x, camera.rot.y, camera.rot.z)
+            let lPoint = {x: camera.pos.x+rotated.x, y: camera.pos.y+rotated.y, z: camera.pos.z+rotated.z}
+            let rotated2 = rotVec({x:0, y:0, z:-1}, ...initialAngle)
+
+            let raycast = raycast3D(camera.pos.x, camera.pos.y, camera.pos.z, rotated2.x, rotated2.y, rotated2.z, 100)
+            let d = {x: raycast.point.x-lPoint.x, y: raycast.point.y-lPoint.y, z: raycast.point.z-lPoint.z}
+            
+            let len = Math.sqrt((raycast.point.x-lPoint.x)**2 + (raycast.point.z-lPoint.z)**2)
+            let rotated3 = rotVec({x:0, y:0, z:-1}, Math.atan2(d.y, len), -Math.atan2(d.z, d.x)-Math.PI/2, 0)
+
+            let rLen = Math.sqrt(rotated3.x**2 + rotated3.y**2 + rotated3.z**2)
+            let moveDir = {x: rotated3.x/rLen*100*bulletSpeed, y: rotated3.y/rLen*100*bulletSpeed, z: rotated3.z/rLen*100*bulletSpeed}
+           
+            let bulletData = [id, bulletID, camera.pos.x+rotated.x, camera.pos.y+rotated.y, camera.pos.z+rotated.z, moveDir.x, moveDir.y, moveDir.z, bulletSize, bounces, lifeTime, drag, colour, bulletRandom, homing, vel]
+            
+            bulletID += 1
+
+            this.bullets.push(new Bullet(...bulletData))
             this.bullets[this.bullets.length-1].real = true
-            sendMsg({bullet: [id, camera.pos.x, camera.pos.y, camera.pos.z, rotated.x, rotated.y, rotated.z, bulletSize, bounces, lifeTime, drag, colour]})
+            sendMsg({bullet: bulletData})
         }
 
         for (let i = 0; i < this.bullets.length; i++) {
             this.bullets[i].update()
-            if (!this.bullets[i].exists) {
+            if (!this.bullets[i].exists || i < this.bullets.length-maxBullets) {
                 this.bullets[i].mesh.delete()
                 this.bullets.splice(i, 1)
                 i--
             }
         }
+        
+        this.rot.y = camera.rot.y
+        this.mesh.visible = false
+
+        while (this.checkCollide()) {
+            this.pos.y += 1*delta
+        }
+    }
+    updateModel() {
+        if (isNaN(this.pos.x)) {
+            this.pos = {x: 0, y: 0, z: 0}
+        }
+        if (isNaN(this.rot.y)) {
+            this.rot.y = 0
+        }
+        if (isNaN(this.lso.rot.x)) {
+            this.lso.rot.x = 0
+        }
+
+        this.mesh.pos = {...this.pos}
+        this.mesh.rot.y = this.rot.y
 
         this.lsv -= 60 * delta
 
@@ -98,10 +141,6 @@ class Player extends Object3D {
 
         if (this.laserShooter.rot.x < 0) {
             this.laserShooter.rot.x = 0
-        }
-
-        while (this.checkCollide()) {
-            this.pos.y += 0.01
         }
     }
     checkCollide() {

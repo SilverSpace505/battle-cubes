@@ -39,6 +39,21 @@ function connectToServer() {
 			connected = true
 			console.log("Connected with id: " + msg.id)
 			id = msg.id
+
+            console.log("Ahh, i see you want to mess some stuff up, here's some variables to try out!")
+            console.log("speed - player speed [default:250]")
+            console.log("jump - player jump height [default:7]")
+            console.log("gravity - player gravity [default:18]")
+            console.log("bulletSize - the bullet size [default:0.1]")
+            console.log("bulletSpeed - the bullet speed [default:1]")
+            console.log("vel - the bullet veloctiy [default:[0, 0, 0]]")
+            console.log("bounces - the bullet bounces [default:0]")
+            console.log("lifeTime - the bullet life time [default:1] WARNING: very dangerous")
+            console.log("colour - the colour of the bullet in [red, green, blue] from 0 to 1 [default:[0, 1, 1]]")
+            console.log("bulletRandom - makes the bullet move randomly [default:0]")
+            console.log("homing - makes the bullet home in on players [default:0]")
+            console.log("drag - makes the bullet slow down, negative numbers make it go faster [default:0]")
+            console.log("maxBullets - the max amount of bullets [default:50]")
 		}
         if (msg.lobbies) {
             lobbies = msg.lobbies

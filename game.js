@@ -11,8 +11,8 @@ var uiT = 0
 var page = "main"
 
 function srand(seed) {
-    seed += 748473
-    return (Math.sin(seed*482032832)+1)/2
+    let x = Math.sin(seed*3902+7459)*Math.cos(seed*4092+4829)*10000
+	return x - Math.floor(x)
 }
 
 var menuButton = new ui.Button(0, 0, 0, 0, "rect", "Menu")
@@ -30,6 +30,8 @@ privateButton.bgColour = [0, 0, 0, 0.5]
 var passwordTo = new ui.TextBox(0, 0, 0, 0, "Password")
 
 var passType = 0
+
+var bulletID = 1
 
 function createBox(x, y, z, width, height, depth, colour, texture="none", doScale=true, uvMul=1) {
     let newBox = new webgl.Box(x, y, z, width, height, depth, colour)
@@ -137,7 +139,7 @@ var oldPass = ""
 
 function clearBullets() {
     for (let bullet of player.bullets) {
-        bullet.delete()
+        bullet.mesh.delete()
     }
     player.bullets = []
 }
@@ -147,14 +149,18 @@ function gameTick() {
 
     for (let player in players) {
         if (!playerData[player]) {
-            players[player].delete()
+            // players[player]
             delete players[player]
         }
     }
 
     for (let player in playerData) {
         if (!players[player] && player != id) {
-            players[player] = new webgl.Box(0, 0, 0, 0.5, 1.9, 0.5, [0, 0.5, 1])
+            players[player] = new Player(0, 0, 0)
+            for (let mesh of players[player].laserShooter.meshes) {
+                mesh.ignoreDepth = false
+                mesh.order = false
+            }
         }
     }
 
@@ -186,10 +192,20 @@ function gameTick() {
     player.update()
     camera.pos = {x:player.pos.x, y:player.pos.y+0.5, z:player.pos.z}
 
+    player.updateModel()
+
     player.lso.pos = {...camera.pos}
     player.lso.rot = {...camera.rot}
     player.lso.update()
     player.laserShooter.update()
+
+    for (let player in players) {
+        players[player].lso.pos = {...players[player].pos}
+        players[player].lso.pos.y += 0.25
+        players[player].lso.rot.y = players[player].rot.y
+        players[player].lso.update()
+        players[player].laserShooter.update()
+    }
 
     tFov = 60
     if (player.sprinting) {
@@ -225,6 +241,8 @@ function gameTick() {
         players[player].pos.y += (playerData[player].y - players[player].pos.y) * delta * 15
         players[player].pos.z += (playerData[player].z - players[player].pos.z) * delta * 15
         players[player].rot.y += (playerData[player].rot - players[player].rot.y) * delta * 15
+        players[player].lso.rot.x += (playerData[player].rotx - players[player].lso.rot.x) * delta * 15
+        players[player].updateModel()
     }
 
     view = mat4.create()
@@ -253,6 +271,11 @@ function gameTick() {
     test.aRender()
     player.laserShooter.aRender()
     player.lso.aRender()
+
+    for (let player in players) {
+        players[player].laserShooter.aRender()
+        players[player].lso.aRender()
+    }
 
     if (input.isMouseLocked()) {
         uiT = 0
@@ -368,5 +391,29 @@ function gameTick() {
         y: player.pos.y,
         z: player.pos.z,
         rot: camera.rot.y,
+        rotx: camera.rot.x,
     }
+}
+
+
+
+function raycast3D(x, y, z, vx, vy, vz, maxD, stepD=0.1) {
+    let r = {x:x, y:y, z:z, s:stepD}
+
+    while (Math.sqrt((r.x-x)**2 + (r.y-y)**2 + (r.z-z)**2) < maxD) {
+        r.x += vx * stepD
+        r.y += vy * stepD
+        r.z += vz * stepD
+        for (let player in players) {
+            if (player != id && isColliding3D(r.x, r.y, r.z, r.s, r.s, r.s, players[player].pos.x, players[player].pos.y, players[player].pos.z, players[player].size.x, players[player].size.y, players[player].size.z)) {
+                return {d: Math.sqrt((r.x-x)**2 + (r.y-y)**2 + (r.z-z)**2), point: r}
+            }
+        }
+        for (let box of boxes) {
+            if (isColliding3D(r.x, r.y, r.z, r.s, r.s, r.s, box.pos.x, box.pos.y, box.pos.z, box.size.x, box.size.y, box.size.z)) {
+                return {d: Math.sqrt((r.x-x)**2 + (r.y-y)**2 + (r.z-z)**2), point: r}
+            }
+        }
+    }
+    return {d: Math.sqrt((r.x-x)**2 + (r.y-y)**2 + (r.z-z)**2), point: r}
 }

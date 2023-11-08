@@ -19,6 +19,10 @@ var bulletSpeed = 1
 var colour = [0, 1, 1]
 var drag = 0
 var rapidFire = false
+var bulletRandom = 0
+var homing = 0
+var vel = [0, 0, 0]
+var maxBullets = 50
 
 var view = mat4.create()
 const projection = mat4.create()
