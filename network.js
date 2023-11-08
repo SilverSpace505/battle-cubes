@@ -58,8 +58,8 @@ function connectToServer() {
             showM("Joined lobby: " + lobby)
             tScene = "game"
             overlayT = 1
-            player.pos = {x: 0, y: 1, z: 0}
-            player.vel = {x: 0, y: 0, z: 0}
+            player.spawn()
+            clearBullets()
             uiA = 0
             camera.rot = {x: 0, y: -Math.PI/2-Math.PI*1000, z: 0}
             input.lockMouse()
@@ -94,8 +94,7 @@ function connectToServer() {
             player.bullets.push(new Bullet(...msg.bullet))
         }
         if (msg.hit) {
-            player.pos = {x: 0, y: 1, z: 0}
-            player.vel = {x: 0, y: 0, z: 0}
+            player.spawn()
         }
     })
 

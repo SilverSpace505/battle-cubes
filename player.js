@@ -6,7 +6,7 @@ class Player extends Object3D {
     lsv = 0
     bullets = []
     constructor(x, y, z) {
-        super(x, y, z, 0.5, 1.9, 0.5)
+        super(x, y, z, 0.5, 0.5, 0.5)
         
         let laserShooterG = []
         laserShooterG.push(new webgl.Box(0, 1.05-0.875, -0.4, 0.1, 0.1, 0.2, [0, 1, 1]))
@@ -21,6 +21,12 @@ class Player extends Object3D {
         }
         this.laserShooter = new webgl.Group(0.65, -0.4, -1, laserShooterG)
         this.lso = new webgl.Group(0, 0, 0, [this.laserShooter])
+    }
+    spawn(range=10) {
+        this.pos.x = (Math.random()-0.5)*2*range
+        this.pos.y = 1
+        this.pos.z = (Math.random()-0.5)*2*range
+        this.vel = {x: 0, y: 0, z: 0}
     }
     update() {
         this.vel.x -= (1 - 0.5) * delta * this.vel.x * 100

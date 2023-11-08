@@ -173,6 +173,7 @@ class Explosion extends Object3D {
         this.mesh.rot.x = Math.random()*Math.PI*2
         this.mesh.rot.y = Math.random()*Math.PI*2
         this.mesh.rot.z = Math.random()*Math.PI*2
+        this.mesh.oneSide = false
 
         this.rv = {x:(Math.random()-0.5)*2 * Math.PI*2,y:(Math.random()-0.5)*2 * Math.PI*2,z:(Math.random()-0.5)*2 * Math.PI*2}
     }

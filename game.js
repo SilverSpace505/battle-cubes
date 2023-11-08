@@ -123,6 +123,7 @@ testG.push(createBox(0, 0, 0.5, ts, ts, ts, [0, 0, 1]))
 var test = new webgl.Group(0, 1, -5, testG)
 
 var player = new Player(0, 1, 0)
+player.spawn()
 
 var time = 0
 
@@ -133,6 +134,13 @@ var paused = false
 var players = {}
 
 var oldPass = ""
+
+function clearBullets() {
+    for (let bullet of player.bullets) {
+        bullet.delete()
+    }
+    player.bullets = []
+}
 
 function gameTick() {
     time += delta
@@ -216,6 +224,7 @@ function gameTick() {
         players[player].pos.x += (playerData[player].x - players[player].pos.x) * delta * 15
         players[player].pos.y += (playerData[player].y - players[player].pos.y) * delta * 15
         players[player].pos.z += (playerData[player].z - players[player].pos.z) * delta * 15
+        players[player].rot.y += (playerData[player].rot - players[player].rot.y) * delta * 15
     }
 
     view = mat4.create()
@@ -358,5 +367,6 @@ function gameTick() {
         x: player.pos.x,
         y: player.pos.y,
         z: player.pos.z,
+        rot: camera.rot.y,
     }
 }

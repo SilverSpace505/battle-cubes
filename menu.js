@@ -18,7 +18,7 @@ function menuTick() {
         return
     }
 
-    ui.text(canvas.width/2, 100*su, 100*su, "FPS Game", {align: "center"})
+    ui.text(canvas.width/2, 100*su, 100*su, "Battle Cubes", {align: "center"})
 
     playButton.set(canvas.width/2, canvas.height/2, 300*su, 100*su)
     playButton.textSize = 75*su
