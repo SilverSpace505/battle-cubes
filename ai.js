@@ -1,5 +1,5 @@
 
-class Player extends Object3D {
+class AI extends Object3D {
     vel = {x: 0, y: 0, z: 0}
     laserShooter
     lso // laser shooter origin
@@ -7,10 +7,13 @@ class Player extends Object3D {
     bullets = []
     mesh = []
     ls = 0.75
+    camera = {x: 0, y: 0, z: 0}
+    cvel = {x: 0, y: 0}
+    id = 0
     constructor(x, y, z) {
         super(x, y, z, 0.75, 0.75, 0.75)
 
-        this.mesh = new webgl.Box(0, 0, 0, 0.75, 0.75, 0.75, [0, 0.5, 1])
+        this.mesh = new webgl.Box(0, 0, 0, 0.75, 0.75, 0.75, [1, 0, 0])
 
         let ls = this.ls
         
@@ -21,40 +24,82 @@ class Player extends Object3D {
         laserShooterG.push(new webgl.Box(0*ls, (0.7-0.875)*ls, 0.3*ls, 0.2*ls, 0.3*ls, 0.2*ls, [1, 1, 1]))
         laserShooterG.push(new webgl.Box(0*ls, (1-0.875)*ls, 0*ls, 0.2*ls, 0.3*ls, 0.8*ls, [1, 1, 1]))
         laserShooterG[2].rot.x = Math.PI/4
-        for (let mesh of laserShooterG) {
-            mesh.ignoreDepth = true
-        }
         this.laserShooter = new webgl.Group(0.65*ls, -0.4*ls, -1*ls, laserShooterG)
         this.lso = new webgl.Group(0, 0, 0, [this.laserShooter])
     }
-    spawn(range=0) {
+    spawn(range=50) {
         this.pos.x = (Math.random()-0.5)*2*range
         this.pos.y = 1
         this.pos.z = (Math.random()-0.5)*2*range
         this.vel = {x: 0, y: 0, z: 0}
     }
     update() {
-        this.vel.x -= (1 - 0.5) * delta * this.vel.x * 100
-        this.vel.z -= (1 - 0.5) * delta * this.vel.z * 100
-        this.vel.y -= gravity * delta
+        this.vel.x -= (1 - 0.95) * delta * this.vel.x * 100
+        this.vel.z -= (1 - 0.95) * delta * this.vel.z * 100
+        this.vel.y -= aigravity * delta
+
+        this.cvel.x -= (1 - 0.95) * delta * this.cvel.x * 100
+        this.cvel.y -= (1 - 0.95) * delta * this.cvel.y * 100
 
         let moveDir = {x: 0, z: 0}
 
-        if (keys["KeyW"] && !paused) {
-            moveDir.x -= Math.sin(camera.rot.y)
-            moveDir.z -= Math.cos(camera.rot.y)
+        if (Math.random() < 10*delta) {
+            this.cvel.x -= 1*delta
         }
-        if (keys["KeyS"] && !paused) {
-            moveDir.x += Math.sin(camera.rot.y)
-            moveDir.z += Math.cos(camera.rot.y)
+        if (Math.random() < 10*delta) {
+            this.cvel.x += 1*delta
         }
-        if (keys["KeyA"] && !paused) {
-            moveDir.x -= Math.cos(camera.rot.y)
-            moveDir.z += Math.sin(camera.rot.y)
+        if (Math.random() < 10*delta) {
+            this.cvel.y += 1*delta
         }
-        if (keys["KeyD"] && !paused) {
-            moveDir.x += Math.cos(camera.rot.y)
-            moveDir.z -= Math.sin(camera.rot.y)
+        if (Math.random() < 10*delta) {
+            this.cvel.y -= 1*delta
+        }
+
+        this.camera.x += this.cvel.x
+        this.camera.y += this.cvel.y
+
+        let ds = []
+        for (let player in playerData) {
+            if (player != this.id) {
+                ds.push([playerData[player], Math.sqrt((playerData[player].x-this.pos.x)**2 + (playerData[player].y-this.pos.y)**2 + (playerData[player].z-this.pos.z)**2)])
+            }
+        }
+        for (let ai of ais) {
+            if (ai.id != this.id) {
+                ds.push([ai.pos, Math.sqrt((ai.pos.x-this.pos.x)**2 + (ai.pos.y-this.pos.y)**2 + (ai.pos.z-this.pos.z)**2)])
+            }
+        }
+        ds.sort((a, b) => (a[1] - b[1]))
+
+        this.camera.y += (Math.atan2(ds[0][0].x-this.pos.x, ds[0][0].z-this.pos.z)+Math.PI - this.camera.y) * delta * 10
+
+        let len = Math.sqrt((ds[0][0].x-this.pos.x)**2 + (ds[0][0].z-this.pos.z)**2)
+
+        this.camera.x += (Math.atan2(ds[0][0].y-this.pos.y, len) - this.camera.x) * delta * 10
+
+        if (this.camera.x > Math.PI/2*0.99) {
+			this.camera.x = Math.PI/2*0.99
+		}
+		if (this.camera.x < -Math.PI/2*0.99) {
+			this.camera.x = -Math.PI/2*0.99
+		}
+
+        if (Math.random() < 10*delta) {
+            moveDir.x -= Math.sin(this.camera.y)
+            moveDir.z -= Math.cos(this.camera.y)
+        }
+        if (Math.random() < 10*delta) {
+            moveDir.x += Math.sin(this.camera.y)
+            moveDir.z += Math.cos(this.camera.y)
+        }
+        if (Math.random() < 10*delta) {
+            moveDir.x -= Math.cos(this.camera.y)
+            moveDir.z += Math.sin(this.camera.y)
+        }
+        if (Math.random() < 10*delta) {
+            moveDir.x += Math.cos(this.camera.y)
+            moveDir.z -= Math.sin(this.camera.y)
         }
 
         let length = Math.sqrt(moveDir.x**2 + moveDir.z**2)
@@ -63,59 +108,48 @@ class Player extends Object3D {
         }
 
         if (this.sprinting) {
-            this.speed *= 2
+            this.aispeed *= 2
         }
 
-        this.vel.x += moveDir.x * speed * delta
-        this.vel.z += moveDir.z * speed * delta
+        this.vel.x += moveDir.x * aispeed / 2 * delta
+        this.vel.z += moveDir.z * aispeed / 2 * delta
 
         if (this.sprinting) {
-            this.speed /= 2
+            this.aispeed /= 2
         }
 
 
-        if (jKeys["Space"] && this.falling < 0.1) {
-            this.vel.y = jump
+        if (Math.random() < 0.5*delta && this.falling < 0.1) {
+            this.vel.y = aijump
         }
-        this.move(this.vel.x * delta, this.vel.y * delta, this.vel.z * delta, 1/delta)
+        this.move(this.vel.x * delta, this.vel.y * delta, this.vel.z * delta, 1/delta/10)
 
-        if ((mouse.lclick || (rapidFire && mouse.ldown)) && isValid) {
+        if (Math.random() < 1*delta) {
             this.lsv = 6
             this.laserShooter.rot.x = 0
-            let initialAngle = [camera.rot.x + (Math.random()-0.5)*2*spread, camera.rot.y + (Math.random()-0.5)*2*spread, camera.rot.z]
-            let rotated = rotVec({x: 0.65*this.ls, y: -0.4*this.ls, z: -1*this.ls}, camera.rot.x, camera.rot.y, camera.rot.z)
-            let lPoint = {x: camera.pos.x+rotated.x, y: camera.pos.y+rotated.y, z: camera.pos.z+rotated.z}
+            let initialAngle = [this.camera.x + (Math.random()-0.5)*2*spread, this.camera.y + (Math.random()-0.5)*2*spread, camera.rot.z]
+            let rotated = rotVec({x: 0.65*this.ls, y: -0.4*this.ls, z: -1*this.ls}, this.camera.x, this.camera.y, camera.rot.z)
+            let lPoint = {x: this.pos.x+rotated.x, y: this.pos.y+0.35+rotated.y, z: this.pos.z+rotated.z}
             let rotated2 = rotVec({x:0, y:0, z:-1}, ...initialAngle)
 
-            let raycast = raycast3D(camera.pos.x, camera.pos.y, camera.pos.z, rotated2.x, rotated2.y, rotated2.z, 100)
+            let raycast = raycast3D(this.pos.x, this.pos.y, this.pos.z, rotated2.x, rotated2.y, rotated2.z, 100)
             let d = {x: raycast.point.x-lPoint.x, y: raycast.point.y-lPoint.y, z: raycast.point.z-lPoint.z}
             
             let len = Math.sqrt((raycast.point.x-lPoint.x)**2 + (raycast.point.z-lPoint.z)**2)
             let rotated3 = rotVec({x:0, y:0, z:-1}, Math.atan2(d.y, len), -Math.atan2(d.z, d.x)-Math.PI/2, 0)
 
             let rLen = Math.sqrt(rotated3.x**2 + rotated3.y**2 + rotated3.z**2)
-            let moveDir = {x: rotated3.x/rLen*100*bulletSpeed, y: rotated3.y/rLen*100*bulletSpeed, z: rotated3.z/rLen*100*bulletSpeed}
+            let moveDir = {x: rotated3.x/rLen*100*aibulletSpeed, y: rotated3.y/rLen*100*aibulletSpeed, z: rotated3.z/rLen*100*aibulletSpeed}
            
-            let bulletData = [id, bulletID, camera.pos.x+rotated.x, camera.pos.y+rotated.y, camera.pos.z+rotated.z, moveDir.x, moveDir.y, moveDir.z, bulletSize, bounces, lifeTime, drag, colour, bulletRandom, homing, vel]
+            let bulletData = [this.id, bulletID, this.pos.x+rotated.x, this.pos.y+rotated.y, this.pos.z+rotated.z, moveDir.x, moveDir.y, moveDir.z, aibulletSize, aibounces, ailifeTime, aidrag, aicolour, aibulletRandom, aihoming, aivel]
             
             bulletID += 1
 
-            this.bullets.push(new Bullet(...bulletData))
-            this.bullets[this.bullets.length-1].real = true
+            player.bullets.push(new Bullet(...bulletData))
             sendMsg({bullet: bulletData})
         }
 
-        for (let i = 0; i < this.bullets.length; i++) {
-            this.bullets[i].update()
-            if (!this.bullets[i].exists || i < this.bullets.length-maxBullets) {
-                this.bullets[i].mesh.delete()
-                this.bullets.splice(i, 1)
-                i--
-            }
-        }
-
-        this.rot.y = camera.rot.y
-        this.mesh.visible = false
+        this.rot.y = this.camera.y
 
         while (this.checkCollide()) {
             this.pos.y += 1*delta

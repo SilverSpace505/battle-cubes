@@ -9,6 +9,8 @@ var playerData = {}
 
 var lobbyLoading = false
 
+var isHost = false
+
 function sendMsg(sendData, bypass=false) {
 	if (ws.readyState == WebSocket.OPEN && (connected || bypass)) {
 		ws.send(JSON.stringify(sendData))
@@ -110,6 +112,13 @@ function connectToServer() {
         }
         if (msg.hit) {
             player.spawn()
+        }
+        if (msg.aihit) {
+            for (let ai of ais) {
+                if (ai.id == msg.aihit) {
+                    ai.spawn()
+                }
+            }
         }
     })
 

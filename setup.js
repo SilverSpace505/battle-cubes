@@ -24,6 +24,24 @@ var homing = 0
 var vel = [0, 0, 0]
 var maxBullets = 50
 
+var aigravity = 0.3 * 60
+var aispeed = 250
+var aijump = 7
+
+var aibounces = 0
+var ailifeTime = 1
+var aispread = 0.01
+var aibulletSize = 0.1
+var aibulletSpeed = 1
+var aicolour = [0, 1, 1]
+var aidrag = 0
+var airapidFire = false
+var aibulletRandom = 0
+var aihoming = 0
+var aivel = [0, 0, 0]
+var aimaxBullets = 50
+
+
 var view = mat4.create()
 const projection = mat4.create()
 

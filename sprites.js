@@ -81,11 +81,16 @@ class Bullet extends Object3D {
             this.vel.z += (srand(this.time*3+this.id2*5+2)-0.5)*2 * this.random * delta
         }
 
-        if (this.homing != 0 && Object.keys(players).length > 0) {
+        if (this.homing != 0) {
             let ds = []
             for (let player in playerData) {
                 if (player != this.id) {
                     ds.push([playerData[player], Math.sqrt((playerData[player].x-this.pos.x)**2 + (playerData[player].y-this.pos.y)**2 + (playerData[player].z-this.pos.z)**2)])
+                }
+            }
+            for (let ai of ais) {
+                if (ai.id != this.id) {
+                    ds.push([ai.pos, Math.sqrt((ai.pos.x-this.pos.x)**2 + (ai.pos.y-this.pos.y)**2 + (ai.pos.z-this.pos.z)**2)])
                 }
             }
             ds.sort((a, b) => (a[1] - b[1]))
@@ -101,7 +106,7 @@ class Bullet extends Object3D {
             this.vel.z += this.vel2[2] * delta
         }
         
-        this.move(this.vel.x*delta, this.vel.y*delta, this.vel.z*delta, 1/delta)
+        this.move(this.vel.x*delta, this.vel.y*delta, this.vel.z*delta, 1/delta/5)
         this.mesh.pos = {...this.pos}
 
         let d = Math.sqrt(this.vel.x**2 + this.vel.z**2)
@@ -115,10 +120,24 @@ class Bullet extends Object3D {
             this.exists = false
         }
         
-        if (this.real) {
+        if (this.real || this.id < 0) {
             for (let player in players) {
                 if (this.isColliding([players[player]])) {
                     sendMsg({hit: player})
+                }
+            }
+            for (let ai of ais) {
+                if (ai.id != this.id && this.isColliding([ai])) {
+                    if (isHost) {
+                        ai.spawn()
+                    } else {
+                        sendMsg({aihit: ai.id})
+                    }
+                }
+            }
+            if (this.id < 0) {
+                if (this.isColliding([player])) {
+                    player.spawn()
                 }
             }
         }
@@ -126,6 +145,16 @@ class Bullet extends Object3D {
     checkCollide() {
         for (let player in players) {
             if (player != this.id && this.isColliding([players[player]])) {
+                return true
+            }
+        }
+        for (let ai of ais) {
+            if (ai.id != this.id && this.isColliding([ai])) {
+                return true
+            }
+        }
+        if (this.id < 0) {
+            if (this.isColliding([player])) {
                 return true
             }
         }
@@ -146,10 +175,24 @@ class Bullet extends Object3D {
                 }
                 this.bounces += 1
                 explosions.push(new Explosion(this.pos.x, this.pos.y, this.pos.z, f, this.colour))
-                if (this.real) {
+                if (this.real || this.id < 0) {
                     for (let player in players) {
                         if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, players[player].pos.x, players[player].pos.y, players[player].pos.z, players[player].size.x, players[player].size.y, players[player].size.z)) {
                             sendMsg({hit: player})
+                        }
+                    }
+                    if (this.id < 0) {
+                        if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, player.pos.x, player.pos.y, player.pos.z, player.size.x, player.size.y, player.size.z)) {
+                            player.spawn()
+                        }
+                    }
+                    for (let ai of ais) {
+                        if (ai.id != this.id && isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, ai.pos.x, ai.pos.y, ai.pos.z, ai.size.x, ai.size.y, ai.size.z)) {
+                            if (isHost) {
+                                ai.spawn()
+                            } else {
+                                sendMsg({aihit: ai.id})
+                            }
                         }
                     }
                 }
@@ -162,10 +205,24 @@ class Bullet extends Object3D {
                 this.vel.z *= -1
                 this.bounces += 1
                 explosions.push(new Explosion(this.pos.x, this.pos.y, this.pos.z, f, this.colour))
-                if (this.real) {
+                if (this.real || this.id < 0) {
                     for (let player in players) {
                         if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, players[player].pos.x, players[player].pos.y, players[player].pos.z, players[player].size.x, players[player].size.y, players[player].size.z)) {
                             sendMsg({hit: player})
+                        }
+                    }
+                    if (this.id < 0) {
+                        if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, player.pos.x, player.pos.y, player.pos.z, player.size.x, player.size.y, player.size.z)) {
+                            player.spawn()
+                        }
+                    }
+                    for (let ai of ais) {
+                        if (ai.id != this.id && isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, ai.pos.x, ai.pos.y, ai.pos.z, ai.size.x, ai.size.y, ai.size.z)) {
+                            if (isHost) {
+                                ai.spawn()
+                            } else {
+                                sendMsg({aihit: ai.id})
+                            }
                         }
                     }
                 }
@@ -181,10 +238,24 @@ class Bullet extends Object3D {
                 }
                 this.bounces += 1
                 explosions.push(new Explosion(this.pos.x, this.pos.y, this.pos.z, f, this.colour))
-                if (this.real) {
+                if (this.real || this.id < 0) {
                     for (let player in players) {
                         if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, players[player].pos.x, players[player].pos.y, players[player].pos.z, players[player].size.x, players[player].size.y, players[player].size.z)) {
                             sendMsg({hit: player})
+                        }
+                    }
+                    if (this.id < 0) {
+                        if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, player.pos.x, player.pos.y, player.pos.z, player.size.x, player.size.y, player.size.z)) {
+                            player.spawn()
+                        }
+                    }
+                    for (let ai of ais) {
+                        if (ai.id != this.id && isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, ai.pos.x, ai.pos.y, ai.pos.z, ai.size.x, ai.size.y, ai.size.z)) {
+                            if (isHost) {
+                                ai.spawn()
+                            } else {
+                                sendMsg({aihit: ai.id})
+                            }
                         }
                     }
                 }

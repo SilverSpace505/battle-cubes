@@ -157,6 +157,13 @@ for (let i = 0; i < 6; i++) {
     skybox.uvs.push(0, 0, repeat, repeat, repeat, 0, 0, repeat)
 }
 
+var ais = []
+for (let i = 0; i < 5; i++) {
+    ais.push(new AI(0, 1, 0))
+    ais[ais.length-1].spawn()
+    ais[ais.length-1].id = -i - 1
+}
+
 // spawn
 house(0, 0, 0, 10, 4, 10, ["1,0", "-1,0", "0,1", "0,-1", "top"])
 house(0, 4, 0, 10, 4, 10, ["1,0", "-1,0", "bottom", "top"])
@@ -262,6 +269,26 @@ function gameTick() {
         players[player].laserShooter.update()
     }
 
+    for (let ai of ais) {
+        if (isHost) {
+            ai.update()
+        } else if (lobbyData && lobbyData.host && playerData[lobbyData.host] && playerData[lobbyData.host].ais) {
+            ai.pos.x += (playerData[lobbyData.host].ais[ai.id.toString()][0] - ai.pos.x) * delta * 10
+            ai.pos.y += (playerData[lobbyData.host].ais[ai.id.toString()][1] - ai.pos.y) * delta * 10
+            ai.pos.z += (playerData[lobbyData.host].ais[ai.id.toString()][2] - ai.pos.z) * delta * 10
+            ai.camera.x += (playerData[lobbyData.host].ais[ai.id.toString()][3] - ai.camera.x) * delta * 10
+            ai.camera.y += (playerData[lobbyData.host].ais[ai.id.toString()][4] - ai.camera.y) * delta * 10
+        }
+        ai.rot.y = ai.camera.y
+        ai.lso.pos = {...ai.pos}
+        ai.lso.pos.y += 0.35
+        ai.lso.rot.y = ai.rot.y
+        ai.lso.rot.x = ai.camera.x
+        ai.lso.update()
+        ai.laserShooter.update()
+        ai.updateModel()
+    }
+
     tFov = 60
     if (player.sprinting) {
         tFov = 60*1.33
@@ -330,6 +357,11 @@ function gameTick() {
         players[player].laserShooter.aRender()
         players[player].lso.aRender()
     }
+    
+    for (let ai of ais) {
+        ai.laserShooter.aRender()
+        ai.lso.aRender()
+    }
 
     if (input.isMouseLocked()) {
         uiT = 0
@@ -343,6 +375,8 @@ function gameTick() {
         fetchC = 3
         sendMsg({getLobby: true})
     }
+
+    isHost = lobbyData && lobbyData.host == id
 
     uiA += (uiT - uiA) * delta * 10
 
@@ -446,6 +480,13 @@ function gameTick() {
         z: player.pos.z,
         rot: camera.rot.y,
         rotx: camera.rot.x,
+    }
+    if (isHost) {
+        let poses = {}
+        for (let ai of ais) {
+            poses[ai.id.toString()] = [ai.pos.x, ai.pos.y, ai.pos.z, ai.camera.x, ai.camera.y]
+        }
+        data["ais"] = poses
     }
 }
 
