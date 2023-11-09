@@ -2,6 +2,9 @@
 var playButton = new ui.Button(0, 0, 0, 0, "rect", "Play")
 playButton.bgColour = [0, 0, 0, 0.5]
 
+var instructionsButton = new ui.Button(0, 0, 0, 0, "rect", "Instructions")
+instructionsButton.bgColour = [0, 0, 0, 0.5]
+
 function menuTick() {
     let aspect = 2906/1621
     let bgSize = {x: canvas.height*aspect, y: canvas.width/aspect}
@@ -15,6 +18,10 @@ function menuTick() {
 
     if (scene == "lobbies") {
         lobbiesTick()
+        return
+    }
+    if (scene == "instructions") {
+        instructionsTick()
         return
     }
 
@@ -38,5 +45,18 @@ function menuTick() {
         privateTo.text = ""
         passUI = false
         passA = 0
+    }
+
+    instructionsButton.set(canvas.width/2, canvas.height/2+80*su, 300*su, 50*su)
+    instructionsButton.textSize = 50*su
+
+    instructionsButton.basic()
+
+    instructionsButton.draw()
+
+    if (instructionsButton.hovered() && mouse.lclick) {
+        tScene = "instructions"
+        instructionsButton.click()
+        overlayT = 1
     }
 }
