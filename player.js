@@ -175,4 +175,10 @@ class Player extends Object3D {
             }
         }
     }
+    delete() {
+        for (let mesh of this.laserShooter.meshes) {
+            mesh.delete()
+        }
+        this.mesh.delete()
+    }
 }
