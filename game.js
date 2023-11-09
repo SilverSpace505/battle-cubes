@@ -149,7 +149,7 @@ function gameTick() {
 
     for (let player in players) {
         if (!playerData[player]) {
-            // players[player]
+            players[player].delete()
             delete players[player]
         }
     }
