@@ -190,7 +190,7 @@ function gameTick() {
     test.update()
 
     player.update()
-    camera.pos = {x:player.pos.x, y:player.pos.y+0.5, z:player.pos.z}
+    camera.pos = {x:player.pos.x, y:player.pos.y+0.25, z:player.pos.z}
 
     player.updateModel()
 
