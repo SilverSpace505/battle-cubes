@@ -237,11 +237,11 @@ function gameTick() {
     }
 
     for (let player in players) {
-        players[player].pos.x += (playerData[player].x - players[player].pos.x) * delta * 15
-        players[player].pos.y += (playerData[player].y - players[player].pos.y) * delta * 15
-        players[player].pos.z += (playerData[player].z - players[player].pos.z) * delta * 15
-        players[player].rot.y += (playerData[player].rot - players[player].rot.y) * delta * 15
-        players[player].lso.rot.x += (playerData[player].rotx - players[player].lso.rot.x) * delta * 15
+        players[player].pos.x += (playerData[player].x - players[player].pos.x) * delta * 10
+        players[player].pos.y += (playerData[player].y - players[player].pos.y) * delta * 10
+        players[player].pos.z += (playerData[player].z - players[player].pos.z) * delta * 10
+        players[player].rot.y += (playerData[player].rot - players[player].rot.y) * delta * 10
+        players[player].lso.rot.x += (playerData[player].rotx - players[player].lso.rot.x) * delta * 10
         players[player].updateModel()
     }
 
