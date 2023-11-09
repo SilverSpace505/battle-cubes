@@ -62,67 +62,137 @@ function createBox(x, y, z, width, height, depth, colour, texture="none", doScal
     return newBox
 }
 
-function house(x, y, z, width, height, depth, doorSize={x: 1, y: 2}, doors=["1,0"], wallSize=0.1, logSize=0.5) {
+function house(x, y, z, width, height, depth,  doors=["1,0"], doorSize={x: 1, y: 2}, wallSize=0.1, logSize=0.5) {
     // logs
-    createBox(x-width/2, y+height/2, z-depth/2, logSize, height, logSize, [0.75, 0.75, 0.75], woodTexture)
-    createBox(x+width/2, y+height/2, z+depth/2, logSize, height, logSize, [0.75, 0.75, 0.75], woodTexture)
-    createBox(x-width/2, y+height/2, z+depth/2, logSize, height, logSize, [0.75, 0.75, 0.75], woodTexture)
-    createBox(x+width/2, y+height/2, z-depth/2, logSize, height, logSize, [0.75, 0.75, 0.75], woodTexture)
+    createBox(x-width/2, y+height/2, z-depth/2, logSize, height, logSize, [0.75, 1, 1])
+    createBox(x+width/2, y+height/2, z+depth/2, logSize, height, logSize, [0.75, 1, 1])
+    createBox(x-width/2, y+height/2, z+depth/2, logSize, height, logSize, [0.75, 1, 1])
+    createBox(x+width/2, y+height/2, z-depth/2, logSize, height, logSize, [0.75, 1, 1])
 
+    let c = [0.9, 0.9, 0.9]
     // walls
-    createBox(x-width/2, y+height/2, z, wallSize, height, depth, [0.75, 0.75, 0.75], stoneTexture)
-    if (doors.includes("1,0")) {
-        createBox(x+width/2, y+height/2, z+depth/2-(depth-doorSize.x)/4, wallSize, height, (depth-doorSize.x)/2, [0.75, 0.75, 0.75], stoneTexture)
-        createBox(x+width/2, y+height/2, z-depth/2+(depth-doorSize.x)/4, wallSize, height, (depth-doorSize.x)/2, [0.75, 0.75, 0.75], stoneTexture)
-        createBox(x+width/2, y+doorSize.y+(height-doorSize.y)/2, z, wallSize, height-doorSize.y, doorSize.x, [0.75, 0.75, 0.75], stoneTexture)
+    if (doors.includes("-1,0")) {
+        createBox(x-width/2, y+height/2, z+depth/2-(depth-doorSize.x)/4, wallSize, height, (depth-doorSize.x)/2, c)
+        createBox(x-width/2, y+height/2, z-depth/2+(depth-doorSize.x)/4, wallSize, height, (depth-doorSize.x)/2, c)
+        createBox(x-width/2, y+doorSize.y+(height-doorSize.y)/2, z, wallSize, height-doorSize.y, doorSize.x, c)
     } else {
-        createBox(x+width/2, y+height/2, z, wallSize, height, depth, [0.75, 0.75, 0.75], stoneTexture)
+        createBox(x-width/2, y+height/2, z, wallSize, height, depth, c)
     }
-    createBox(x, y+height/2, z-depth/2, width, height, wallSize, [0.75, 0.75, 0.75], stoneTexture)
-    createBox(x, y+height/2, z+depth/2, width, height, wallSize, [0.75, 0.75, 0.75], stoneTexture)
+    if (doors.includes("1,0")) {
+        createBox(x+width/2, y+height/2, z+depth/2-(depth-doorSize.x)/4, wallSize, height, (depth-doorSize.x)/2, c)
+        createBox(x+width/2, y+height/2, z-depth/2+(depth-doorSize.x)/4, wallSize, height, (depth-doorSize.x)/2, c)
+        createBox(x+width/2, y+doorSize.y+(height-doorSize.y)/2, z, wallSize, height-doorSize.y, doorSize.x, c)
+    } else {
+        createBox(x+width/2, y+height/2, z, wallSize, height, depth, c)
+    }
+    if (doors.includes("0,1")) {
+        createBox(x+width/2-(width-doorSize.x)/4, y+height/2, z+depth/2, (width-doorSize.x)/2, height, wallSize, c)
+        createBox(x-width/2+(width-doorSize.x)/4, y+height/2, z+depth/2, (width-doorSize.x)/2, height, wallSize, c)
+        createBox(x, y+doorSize.y+(height-doorSize.y)/2, z+depth/2, doorSize.x, height-doorSize.y, wallSize, c)
+    } else {
+        createBox(x, y+height/2, z+depth/2, width, height, wallSize, c)
+    }
+    if (doors.includes("0,-1")) {
+        createBox(x+width/2-(width-doorSize.x)/4, y+height/2, z-depth/2, (width-doorSize.x)/2, height, wallSize, c)
+        createBox(x-width/2+(width-doorSize.x)/4, y+height/2, z-depth/2, (width-doorSize.x)/2, height, wallSize, c)
+        createBox(x, y+doorSize.y+(height-doorSize.y)/2, z-depth/2, doorSize.x, height-doorSize.y, wallSize, c)
+    } else {
+        createBox(x, y+height/2, z-depth/2, width, height, wallSize, c)
+    }
+    // createBox(x, y+height/2, z-depth/2, width, height, wallSize, c)
+    // createBox(x, y+height/2, z+depth/2, width, height, wallSize, c)
+
+    let tx = width+wallSize*0.9 
+    let tz = depth+wallSize*0.9 
+
+    let s = tx/2
+    if (tz/2 < s) s = tz/2
 
     // floor and ceiling
-    createBox(x, y, z, width, wallSize/2, depth, [0.75, 0.75, 0.75], woodTexture)
-    createBox(x, y+height, z, width+wallSize*0.9, wallSize, depth+wallSize*0.9, [0.75, 0.75, 0.75], woodTexture)
+    if (doors.includes("bottom")) {
+        createBox(x-tx/2+(tx-s)/4, y, z, (tx-s)/2, wallSize, tz, [0.5, 0.5, 0.5])
+        createBox(x+tx/2-(tx-s)/4, y, z, (tx-s)/2, wallSize, tz, [0.5, 0.5, 0.5])
+
+        createBox(x, y, z-tz/2+(tz-s)/4, s, wallSize, (tz-s)/2, [0.5, 0.5, 0.5])
+        createBox(x, y, z+tz/2-(tz-s)/4, s, wallSize, (tz-s)/2, [0.5, 0.5, 0.5])
+    } else {
+        createBox(x, y, z, width, wallSize/2, depth, [0.5, 0.5, 0.5])
+    }
+    
+    if (doors.includes("top")) {
+        createBox(x-tx/2+(tx-s)/4, y+height, z, (tx-s)/2, wallSize, tz, [0.5, 0.5, 0.5])
+        createBox(x+tx/2-(tx-s)/4, y+height, z, (tx-s)/2, wallSize, tz, [0.5, 0.5, 0.5])
+
+        createBox(x, y+height, z-tz/2+(tz-s)/4, s, wallSize, (tz-s)/2, [0.5, 0.5, 0.5])
+        createBox(x, y+height, z+tz/2-(tz-s)/4, s, wallSize, (tz-s)/2, [0.5, 0.5, 0.5])
+
+        let dirs = [[-1, -1], [1, -1], [1, 1], [-1, 1]]
+        for (let i = 0; i < Math.floor(height)/1; i++) {
+            createBox(x+dirs[i%4][0]*s/4, y+i*1+0.5, z+dirs[i%4][1]*s/4, s/3, wallSize*3, s/3, [0.8, 0.8, 0.8])
+        }
+    } else {
+        createBox(x, y+height, z, width+wallSize*0.9, wallSize, depth+wallSize*0.9, [0.5, 0.5, 0.5])
+    }
 }
 
-function tree(x, y, z, seed) {
-    let height = srand(seed)*1.5 + 2
-    createBox(x, y+height/2, z, 1, height, 1, [0.75, 0.75, 0.75], woodTexture)
-    createBox(x, y+height+1.25, z, 2.5, 2.5, 2.5, [0.75, 0.75, 0.75], leavesTexture)
+function hill(x, y, z, width, height, depth, seed, amt2=3) {
+    createBox(x, y+height/2, z, width, height, depth, [0.75, 0.75, 0.75], noiseTexture)
+    let amt = Math.round(srand(seed)*amt2)
+    for (let i = 0; i < amt; i++) {
+        let h = srand(seed+i*3) * height * 1.5
+        createBox(x+(srand(seed+i*3+3+1)-0.5)*2*width, y+h/2, z+(srand(seed+i*3+3+2)-0.5)*2*depth, width, h, depth, [0.75, 0.75, 0.75], noiseTexture)
+    }
 }
 
-var floor = createBox(0, -0.05, 0, 100, 0.1, 100, [0.75, 0.75, 0.75], grassTexture)
+var floor = createBox(0, -0.05, 0, 100, 0.1, 100, [0.75, 0.75, 0.75], noiseTexture)
 
-createBox(2, 0.5, 0, 1, 1, 1, [0.75, 0.75, 0.75], boxTexture)
-createBox(2, 1.5, 1.5, 1, 1, 1, [0.75, 0.75, 0.75], boxTexture)
-createBox(0.5, 2.5, 1.5, 1, 1, 1, [0.75, 0.75, 0.75], boxTexture)
-createBox(-4, 2.5, 3, 1, 1, 1, [0.75, 0.75, 0.75], boxTexture)
+var skyboxSize = 1000
+var skybox = new webgl.Box(0, 0, 0, skyboxSize, skyboxSize, skyboxSize, [1, 1, 1])
+skybox.useTexture = true
+skybox.texture = starsTexture
+skybox.oneSide = false
+skybox.shading = false
+let repeat = 3
+for (let i = 0; i < 6; i++) {
+    skybox.uvs.push(0, 0, repeat, repeat, repeat, 0, 0, repeat)
+}
 
-createBox(10, 2.5, 0, 5, 5, 5, [0.75, 0.75, 0.75], grassTexture)
-createBox(7, 1.5, 2, 3, 3, 3, [0.75, 0.75, 0.75], grassTexture)
-createBox(10, 2, 3, 3, 4, 3, [0.75, 0.75, 0.75], grassTexture)
+// spawn
+house(0, 0, 0, 10, 4, 10, ["1,0", "-1,0", "0,1", "0,-1", "top"])
+house(0, 4, 0, 10, 4, 10, ["1,0", "-1,0", "bottom", "top"])
+house(0, 8, 0, 10, 4, 10, ["0,1", "0,-1", "bottom"])
+house(7.5, 4, 0, 5, 4, 5, ["1,0", "-1,0", "0,1", "0,-1", "top"], {x: 3, y: 3})
+house(-7.5, 4, 0, 5, 4, 5, ["1,0", "-1,0", "0,1", "0,-1", "top"], {x: 3, y: 3})
+house(0, 8, 7.5, 5, 4, 5, ["1,0", "-1,0", "0,1", "0,-1", "top"], {x: 3, y: 3})
+house(0, 8, -7.5, 5, 4, 5, ["1,0", "-1,0", "0,1", "0,-1", "top"], {x: 3, y: 3})
 
-house(-10, 0, 0, 5, 4, 5)
-house(-10, 0, -6, 3, 10, 3)
+// tower with hill
+hill(25, 0, 25, 10, 10, 10, 8, 10)
+house(8, 0, 15, 5, 10, 5, ["-1,0", "top"])
 
-tree(0, 0, 10, 0)
-tree(1, 0, 8, 1000)
-tree(-1, 0, 9, 2000)
+// city
+house(-8 - 10, 0, 15 + 10, 5, 4, 5, ["-1,0"])
+house(-16 - 10, 0, 10 + 10, 5, 8, 5, ["0,1", "top"])
+house(-20 - 10, 0, 20 + 10, 5, 4, 5, ["0,-1"])
+house(-25 - 10, 0, 12 + 10, 5, 4, 5, ["1,0"])
 
-let secret = createBox(4, 4, 5, 1, 1, 1, [1, 1, 1])
-secret.alpha = 0.05
+// sniper tower
+house(-25, 0, -25, 5, 20, 5, ["1,0", "top"])
+house(-25, 20, -25, 5, 4, 5, ["1,0", "-1,0", "0,1", "0,-1", "bottom"], {x: 3, y: 3})
+hill(-20, 0, -20, 5, 5, 5, 10)
+hill(-20, 0, -30, 5, 5, 5, 11)
+hill(-30, 0, -20, 5, 5, 5, 12)
 
-let testG = []
-let ts = 0.2
-testG.push(createBox(-0.5, 0, 0, ts, ts, ts, [1, 0, 0]))
-testG.push(createBox(0.5, 0, 0, ts, ts, ts, [1, 0, 0]))
-testG.push(createBox(0, -0.5, 0, ts, ts, ts, [0, 1, 0]))
-testG.push(createBox(0, 0.5, 0, ts, ts, ts, [0, 1, 0]))
-testG.push(createBox(0, 0, -0.5, ts, ts, ts, [0, 0, 1]))
-testG.push(createBox(0, 0, 0.5, ts, ts, ts, [0, 0, 1]))
+// hill range
+hill(20, 0, -30, 10, 5, 5, 13)
+hill(30, 0, -20, 5, 4.5, 10, 14)
+hill(20, 0, -20, 5, 5, 5, 15)
+hill(15, 0, -25, 5, 5, 10, 16)
 
-var test = new webgl.Group(0, 1, -5, testG)
+createBox(19.9, 0.5, -23, 1, 1, 1, [0.75, 0.75, 0.75], noiseTexture)
+createBox(17.9, 2, -25, 1, 1, 1, [0.75, 0.75, 0.75], noiseTexture)
+createBox(17.9, 2, -26, 1, 3, 1, [0.75, 0.75, 0.75], noiseTexture)
+createBox(17.9, 2, -27, 1, 5, 1, [0.75, 0.75, 0.75], noiseTexture)
 
 var player = new Player(0, 1, 0)
 player.spawn()
@@ -172,25 +242,10 @@ function gameTick() {
         mouse.lclick = false
     }
 
-    test.pos.y = Math.sin(time)*0.25 + 1
-
-    testG[0].rot.x += 0.01
-    testG[1].rot.x += 0.01
-
-    testG[2].rot.y += 0.01
-    testG[3].rot.y += 0.01
-
-    testG[4].rot.z += 0.01
-    testG[5].rot.z += 0.01
-
-    test.rot.y += 0.01
-
     passType -= delta
 
-    test.update()
-
     player.update()
-    camera.pos = {x:player.pos.x, y:player.pos.y+0.2, z:player.pos.z}
+    camera.pos = {x:player.pos.x, y:player.pos.y+0.3, z:player.pos.z}
 
     player.updateModel()
 
@@ -201,7 +256,7 @@ function gameTick() {
 
     for (let player in players) {
         players[player].lso.pos = {...players[player].pos}
-        players[player].lso.pos.y += 0.25
+        players[player].lso.pos.y += 0.35
         players[player].lso.rot.y = players[player].rot.y
         players[player].lso.update()
         players[player].laserShooter.update()
@@ -253,7 +308,7 @@ function gameTick() {
 	mat4.invert(view, view)
 
 	gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
-	gl.clearColor(0.529, 0.808, 0.922, 1)
+	gl.clearColor(0, 0, 0, 1)
     gl.clear(gl.STENCIL_BUFFER_BIT | gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 	gl.enable(gl.DEPTH_TEST)
 
@@ -268,7 +323,6 @@ function gameTick() {
 
 	webgl.render()
 
-    test.aRender()
     player.laserShooter.aRender()
     player.lso.aRender()
 

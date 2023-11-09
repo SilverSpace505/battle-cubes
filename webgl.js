@@ -451,6 +451,7 @@ class Webgl {
 			lastColour = []
 			colour = [0, 0, 0]
 			visible = true
+			shading = true
 			constructor(x, y, z, width, height, depth, colour, centerRot=true) {
 				super(x, y, z, width, height, depth, [
 					// +X
@@ -547,30 +548,37 @@ class Webgl {
 				if (!this.visible) { return }
 				if (JSON.stringify(this.colour) != JSON.stringify(this.lastColour)) {
 					this.colours = []
-					// +X
-					for (let i = 0; i < 4; i++) {
-						this.colours.push(this.colour[0]*0.85, this.colour[1]*0.85, this.colour[2]*0.85)
+					if (this.shading) {
+						// +X
+						for (let i = 0; i < 4; i++) {
+							this.colours.push(this.colour[0]*0.85, this.colour[1]*0.85, this.colour[2]*0.85)
+						}
+						// -X
+						for (let i = 0; i < 4; i++) {
+							this.colours.push(this.colour[0]*0.7, this.colour[1]*0.7, this.colour[2]*0.7)
+						}
+						// +Y
+						for (let i = 0; i < 4; i++) {
+							this.colours.push(this.colour[0]*1, this.colour[1]*1, this.colour[2]*1)
+						}
+						// -Y
+						for (let i = 0; i < 4; i++) {
+							this.colours.push(this.colour[0]*0.55, this.colour[1]*0.55, this.colour[2]*0.55)
+						}
+						// +Z
+						for (let i = 0; i < 4; i++) {
+							this.colours.push(this.colour[0]*0.75, this.colour[1]*0.75, this.colour[2]*0.75)
+						}
+						// -Z
+						for (let i = 0; i < 4; i++) {
+							this.colours.push(this.colour[0]*0.6, this.colour[1]*0.6, this.colour[2]*0.6)
+						}
+					} else {
+						for (let i = 0; i < 4*6; i++) {
+							this.colours.push(this.colour[0]*1, this.colour[1]*1, this.colour[2]*1)
+						}
 					}
-					// -X
-					for (let i = 0; i < 4; i++) {
-						this.colours.push(this.colour[0]*0.7, this.colour[1]*0.7, this.colour[2]*0.7)
-					}
-					// +Y
-					for (let i = 0; i < 4; i++) {
-						this.colours.push(this.colour[0]*1, this.colour[1]*1, this.colour[2]*1)
-					}
-					// -Y
-					for (let i = 0; i < 4; i++) {
-						this.colours.push(this.colour[0]*0.55, this.colour[1]*0.55, this.colour[2]*0.55)
-					}
-					// +Z
-					for (let i = 0; i < 4; i++) {
-						this.colours.push(this.colour[0]*0.75, this.colour[1]*0.75, this.colour[2]*0.75)
-					}
-					// -Z
-					for (let i = 0; i < 4; i++) {
-						this.colours.push(this.colour[0]*0.6, this.colour[1]*0.6, this.colour[2]*0.6)
-					}
+					
 					this.updateBuffers()
 				}
 				this.lastColour = [...this.colour]

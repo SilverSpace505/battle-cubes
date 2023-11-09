@@ -6,11 +6,11 @@ class Player extends Object3D {
     lsv = 0
     bullets = []
     mesh = []
-    ls = 0.5
+    ls = 0.75
     constructor(x, y, z) {
-        super(x, y, z, 0.5, 0.5, 0.5)
+        super(x, y, z, 0.75, 0.75, 0.75)
 
-        this.mesh = new webgl.Box(0, 0, 0, 0.5, 0.5, 0.5, [0, 0.5, 1])
+        this.mesh = new webgl.Box(0, 0, 0, 0.75, 0.75, 0.75, [0, 0.5, 1])
 
         let ls = this.ls
         
@@ -27,7 +27,7 @@ class Player extends Object3D {
         this.laserShooter = new webgl.Group(0.65*ls, -0.4*ls, -1*ls, laserShooterG)
         this.lso = new webgl.Group(0, 0, 0, [this.laserShooter])
     }
-    spawn(range=20) {
+    spawn(range=0) {
         this.pos.x = (Math.random()-0.5)*2*range
         this.pos.y = 1
         this.pos.z = (Math.random()-0.5)*2*range
@@ -113,7 +113,7 @@ class Player extends Object3D {
                 i--
             }
         }
-        
+
         this.rot.y = camera.rot.y
         this.mesh.visible = false
 
@@ -162,7 +162,11 @@ class Player extends Object3D {
             var lastZ = this.pos.z
             this.pos.z += z / steps
             if (this.checkCollide()) {
-                this.pos.z = lastZ
+                this.pos.y += 0.05
+                if (this.checkCollide()) {
+                    this.pos.z = lastZ
+                    this.pos.y -= 0.05
+                }
             }
             var lastY = this.pos.y
             this.pos.y += y / steps

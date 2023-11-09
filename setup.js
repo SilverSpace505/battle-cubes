@@ -34,6 +34,8 @@ var boxTexture = new webgl.Texture("assets/box.png")
 var woodTexture = new webgl.Texture("assets/wood.png")
 var stoneTexture = new webgl.Texture("assets/stone.png")
 var leavesTexture = new webgl.Texture("assets/leaves.png")
+var noiseTexture = new webgl.Texture("assets/noise.png")
+var starsTexture = new webgl.Texture("assets/stars.png")
 
 var bgImg = new Image(); bgImg.src = "assets/bg.png"
 var peopleImg = new Image(); peopleImg.src = "assets/people.png"
