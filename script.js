@@ -65,8 +65,10 @@ var sensitivity = 0.005
 
 input.mouseMove = (event) => {
     if (!input.isMouseLocked()) {
-        this.mouse.x = event.clientX
-		this.mouse.y = event.clientY
+        if (event.clientX) {
+            this.mouse.x = event.clientX
+            this.mouse.y = event.clientY
+        }
     } else {
         camera.rot.x -= event.movementY*sensitivity
 		if (camera.rot.x > Math.PI/2*0.99) {

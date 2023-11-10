@@ -122,7 +122,7 @@ class AI extends Object3D {
         if (Math.random() < 0.5*delta && this.falling < 0.1) {
             this.vel.y = aijump
         }
-        this.move(this.vel.x * delta, this.vel.y * delta, this.vel.z * delta, 1/delta/10)
+        this.move(this.vel.x * delta, this.vel.y * delta, this.vel.z * delta, 1/delta/25)
 
         if (Math.random() < 1*delta) {
             this.lsv = 6

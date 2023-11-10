@@ -129,6 +129,7 @@ function connectToServer() {
 }
 
 setInterval(() => {
+    if (!window.scene) { return }
     if (scene == "game" && lobby) {
         sendMsg({data: data})
     }

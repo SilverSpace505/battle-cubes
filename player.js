@@ -27,7 +27,7 @@ class Player extends Object3D {
         this.laserShooter = new webgl.Group(0.65*ls, -0.4*ls, -1*ls, laserShooterG)
         this.lso = new webgl.Group(0, 0, 0, [this.laserShooter])
     }
-    spawn(range=0) {
+    spawn(range=50) {
         this.pos.x = (Math.random()-0.5)*2*range
         this.pos.y = 1
         this.pos.z = (Math.random()-0.5)*2*range

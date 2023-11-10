@@ -309,6 +309,45 @@ function gameTick() {
         }
     }
 
+    for (let i = 1; i < 6; i++) {
+        if (jKeys["Digit"+i]) {
+            bulletSize = 0.1
+            bulletSpeed = 1
+            homing = 0
+            bulletRandom = 0
+            spread = 0.01
+            drag = 0
+            vel = [0, 0, 0]
+            rapidFire = false
+            lifeTime = 1
+            
+            if (i == 1) {
+                // pistol
+            } else if (i == 2) {
+                // sniper
+                bulletSpeed = 10
+                spread = 0
+            } else if (i == 3) {
+                // shotgun
+                rapidFire = true
+                spread = 0.1
+                lifeTime = 0.2
+                bulletSpeed = 0.5
+            } else if (i == 4) {
+                // bee gun
+                drag = 0.1
+                bulletRandom = 100
+                bulletSpeed = 0.1
+            } else if (i == 5) {
+                // rocket launcher
+                vel[1] = -10
+                bulletSpeed = 0.1
+                bulletSize = 0.5
+                lifeTime = 2
+            }
+        }
+    }
+
     for (let i = 0; i < explosions.length; i++) {
         explosions[i].update()
         if (explosions[i].mesh.alpha < 0.01) {
