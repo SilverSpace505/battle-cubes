@@ -34,8 +34,8 @@ class Player extends Object3D {
         this.vel = {x: 0, y: 0, z: 0}
     }
     update() {
-        this.vel.x -= (1 - 0.5) * delta * this.vel.x * 100
-        this.vel.z -= (1 - 0.5) * delta * this.vel.z * 100
+        this.vel.x = lerp(this.vel.x, 0, 0.5*100*delta)
+        this.vel.z = lerp(this.vel.z, 0, 0.5*100*delta)
         this.vel.y -= gravity * delta
 
         let moveDir = {x: 0, z: 0}

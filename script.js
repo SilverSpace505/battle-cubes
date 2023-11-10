@@ -11,6 +11,12 @@ var tScene = "menu"
 var overlayA = 0
 var overlayT = 0
 
+function lerp(start, end, multiply) {
+    if (multiply > 1) multiply = 1
+    if (multiply < 0) multiply = 0
+    return start + (end-start) * multiply
+}
+
 function tick(timestamp) {
 requestAnimationFrame(tick)
 
