@@ -55,7 +55,7 @@ requestAnimationFrame(tick)
         menuTick()
     }
 
-    overlayA += (overlayT - overlayA) * delta * 10
+    overlayA = lerp(overlayA, overlayT, delta*10)
 
     if (Math.abs(overlayT-overlayA) < 0.01 && overlayT == 1) {
         overlayT = 0

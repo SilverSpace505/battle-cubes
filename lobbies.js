@@ -43,9 +43,9 @@ function lobbiesTick() {
     sm -= delta
 
     if (sm > 0) {
-        messageA += (1 - messageA) * delta * 10
+        messageA = lerp(messageA, 1, delta*10)
     } else {
-        messageA += (0 - messageA) * delta * 10
+        messageA = lerp(messageA, 0, delta*10)
     }
 
     ctx.globalAlpha = messageA
@@ -162,9 +162,9 @@ function lobbiesTick() {
     ui.setC()
 
     if (passUI) {
-        passA += (1 - passA) * delta * 10
+        passA = lerp(passA, 1, delta*10)
     } else {
-        passA += (0 - passA) * delta * 10
+        passA = lerp(passA, 0, delta*10)
     }
 
     ctx.globalAlpha = passA

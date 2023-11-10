@@ -27,7 +27,7 @@ class Player extends Object3D {
         this.laserShooter = new webgl.Group(0.65*ls, -0.4*ls, -1*ls, laserShooterG)
         this.lso = new webgl.Group(0, 0, 0, [this.laserShooter])
     }
-    spawn(range=50) {
+    spawn(range=20) {
         this.pos.x = (Math.random()-0.5)*2*range
         this.pos.y = 1
         this.pos.z = (Math.random()-0.5)*2*range
@@ -80,29 +80,31 @@ class Player extends Object3D {
         this.move(this.vel.x * delta, this.vel.y * delta, this.vel.z * delta, 1/delta)
 
         if ((mouse.lclick || (rapidFire && mouse.ldown)) && isValid) {
-            this.lsv = 6
-            this.laserShooter.rot.x = 0
-            let initialAngle = [camera.rot.x + (Math.random()-0.5)*2*spread, camera.rot.y + (Math.random()-0.5)*2*spread, camera.rot.z]
-            let rotated = rotVec({x: 0.65*this.ls, y: -0.4*this.ls, z: -1*this.ls}, camera.rot.x, camera.rot.y, camera.rot.z)
-            let lPoint = {x: camera.pos.x+rotated.x, y: camera.pos.y+rotated.y, z: camera.pos.z+rotated.z}
-            let rotated2 = rotVec({x:0, y:0, z:-1}, ...initialAngle)
+            for (let i = 0; i < perShot; i++) {
+                this.lsv = 6
+                this.laserShooter.rot.x = 0
+                let initialAngle = [camera.rot.x + (Math.random()-0.5)*2*spread, camera.rot.y + (Math.random()-0.5)*2*spread, camera.rot.z]
+                let rotated = rotv3({x: 0.65*this.ls, y: -0.4*this.ls, z: -1*this.ls}, camera.rot)
+                let lPoint = {x: camera.pos.x+rotated.x, y: camera.pos.y+rotated.y, z: camera.pos.z+rotated.z}
+                let rotated2 = rotv3({x:0, y:0, z:-1}, vec3(...initialAngle))
 
-            let raycast = raycast3D(camera.pos.x, camera.pos.y, camera.pos.z, rotated2.x, rotated2.y, rotated2.z, 100)
-            let d = {x: raycast.point.x-lPoint.x, y: raycast.point.y-lPoint.y, z: raycast.point.z-lPoint.z}
+                let raycast = raycast3D(camera.pos.x, camera.pos.y, camera.pos.z, rotated2.x, rotated2.y, rotated2.z, 100)
+                let d = {x: raycast.point.x-lPoint.x, y: raycast.point.y-lPoint.y, z: raycast.point.z-lPoint.z}
+                
+                let len = Math.sqrt((raycast.point.x-lPoint.x)**2 + (raycast.point.z-lPoint.z)**2)
+                let rotated3 = rotv3({x:0, y:0, z:-1}, vec3(Math.atan2(d.y, len), -Math.atan2(d.z, d.x)-Math.PI/2, 0))
+
+                let rLen = Math.sqrt(rotated3.x**2 + rotated3.y**2 + rotated3.z**2)
+                let moveDir = {x: rotated3.x/rLen*100*bulletSpeed, y: rotated3.y/rLen*100*bulletSpeed, z: rotated3.z/rLen*100*bulletSpeed}
             
-            let len = Math.sqrt((raycast.point.x-lPoint.x)**2 + (raycast.point.z-lPoint.z)**2)
-            let rotated3 = rotVec({x:0, y:0, z:-1}, Math.atan2(d.y, len), -Math.atan2(d.z, d.x)-Math.PI/2, 0)
+                let bulletData = [id, bulletID, camera.pos.x+rotated.x, camera.pos.y+rotated.y, camera.pos.z+rotated.z, moveDir.x, moveDir.y, moveDir.z, bulletSize, bounces, lifeTime, drag, colour, bulletRandom, homing, vel]
+                
+                bulletID += 1
 
-            let rLen = Math.sqrt(rotated3.x**2 + rotated3.y**2 + rotated3.z**2)
-            let moveDir = {x: rotated3.x/rLen*100*bulletSpeed, y: rotated3.y/rLen*100*bulletSpeed, z: rotated3.z/rLen*100*bulletSpeed}
-           
-            let bulletData = [id, bulletID, camera.pos.x+rotated.x, camera.pos.y+rotated.y, camera.pos.z+rotated.z, moveDir.x, moveDir.y, moveDir.z, bulletSize, bounces, lifeTime, drag, colour, bulletRandom, homing, vel]
-            
-            bulletID += 1
-
-            this.bullets.push(new Bullet(...bulletData))
-            this.bullets[this.bullets.length-1].real = true
-            sendMsg({bullet: bulletData})
+                this.bullets.push(new Bullet(...bulletData))
+                this.bullets[this.bullets.length-1].real = true
+                sendMsg({bullet: bulletData})
+            }
         }
 
         for (let i = 0; i < this.bullets.length; i++) {
@@ -116,6 +118,10 @@ class Player extends Object3D {
 
         this.rot.y = camera.rot.y
         this.mesh.visible = false
+
+        this.laserShooter.meshes[0].colour = colour
+        this.laserShooter.meshes[1].colour = colour
+        this.laserShooter.meshes[2].colour = colour
 
         while (this.checkCollide()) {
             this.pos.y += 1*delta
@@ -148,7 +154,7 @@ class Player extends Object3D {
         }
     }
     checkCollide() {
-        return this.isColliding(boxes)
+        return collidingMap(this)
     }
     move(x, y, z, steps) {
         this.falling += delta

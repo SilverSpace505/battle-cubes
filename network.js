@@ -76,9 +76,12 @@ function connectToServer() {
             tScene = "game"
             overlayT = 1
             player.spawn()
+            for (let ai of ais) {
+                ai.spawn()
+            }
             clearBullets()
             uiA = 0
-            camera.rot = {x: 0, y: -Math.PI/2-Math.PI*1000, z: 0}
+            camera.rot = {x: 0, y: 0, z: 0}
             input.lockMouse()
             passwordTo.text = ""
             passUI = false

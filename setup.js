@@ -1,4 +1,6 @@
 
+utils.setGlobals()
+
 var canvas = document.getElementById("canvas")
 var gl = canvas.getContext("webgl2", { antialias: false })
 
@@ -22,7 +24,8 @@ var rapidFire = false
 var bulletRandom = 0
 var homing = 0
 var vel = [0, 0, 0]
-var maxBullets = 50
+var maxBullets = 250
+var perShot = 1
 
 var aigravity = 0.3 * 60
 var aispeed = 250
@@ -33,7 +36,7 @@ var ailifeTime = 1
 var aispread = 0.01
 var aibulletSize = 0.1
 var aibulletSpeed = 1
-var aicolour = [0, 1, 1]
+var aicolour = [1, 0, 0]
 var aidrag = 0
 var airapidFire = false
 var aibulletRandom = 0
@@ -45,7 +48,7 @@ var aimaxBullets = 50
 var view = mat4.create()
 const projection = mat4.create()
 
-var camera = {pos: {x: 0, y: 0, z: 0}, rot: {x: 0, y: -Math.PI/2-Math.PI*1000, z: 0}}
+var camera = {pos: {x: 0, y: 0, z: 0}, rot: {x: 0, y: 0, z: 0}}
 
 var grassTexture = new webgl.Texture("assets/grass.png")
 var boxTexture = new webgl.Texture("assets/box.png")
@@ -58,25 +61,3 @@ var starsTexture = new webgl.Texture("assets/stars.png")
 var bgImg = new Image(); bgImg.src = "assets/bg.png"
 var peopleImg = new Image(); peopleImg.src = "assets/people.png"
 var keyImg = new Image(); keyImg.src = "assets/key.png"
-
-function rotVec(vec, rx, ry, rz) {
-    // Rotation around Z-axis
-    const cosZ = Math.cos(rz);
-    const sinZ = Math.sin(rz);
-    const x1 = vec.x * cosZ - vec.y * sinZ;
-    const y1 = vec.x * sinZ + vec.y * cosZ;
-
-    // Rotation around X-axis
-    const cosX = Math.cos(rx);
-    const sinX = Math.sin(rx);
-    const y2 = y1 * cosX - vec.z * sinX;
-    const z1 = y1 * sinX + vec.z * cosX;
-
-    // Rotation around Y-axis
-    const cosY = Math.cos(ry);
-    const sinY = Math.sin(ry);
-    const x2 = x1 * cosY + z1 * sinY;
-    const z2 = -x1 * sinY + z1 * cosY;
-
-    return {x:x2, y:y2, z:z2}
-}

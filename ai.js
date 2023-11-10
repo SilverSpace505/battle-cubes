@@ -18,9 +18,9 @@ class AI extends Object3D {
         let ls = this.ls
         
         let laserShooterG = []
-        laserShooterG.push(new webgl.Box(0*ls, (1.05-0.875)*ls, -0.4*ls, 0.1*ls, 0.1*ls, 0.2*ls, [0, 1, 1]))
-        laserShooterG.push(new webgl.Box(0*ls, (0.95-0.875)*ls, -0.4*ls, 0.05*ls, 0.05*ls, 0.1*ls, [0, 1, 1]))
-        laserShooterG.push(new webgl.Box(0*ls, (0.8-0.875)*ls, 0.1*ls, 0.15*ls, 0.15*ls, 0.5*ls, [0, 1, 1]))
+        laserShooterG.push(new webgl.Box(0*ls, (1.05-0.875)*ls, -0.4*ls, 0.1*ls, 0.1*ls, 0.2*ls, [1, 0, 0]))
+        laserShooterG.push(new webgl.Box(0*ls, (0.95-0.875)*ls, -0.4*ls, 0.05*ls, 0.05*ls, 0.1*ls, [1, 0, 0]))
+        laserShooterG.push(new webgl.Box(0*ls, (0.8-0.875)*ls, 0.1*ls, 0.15*ls, 0.15*ls, 0.5*ls, [1, 0, 0]))
         laserShooterG.push(new webgl.Box(0*ls, (0.7-0.875)*ls, 0.3*ls, 0.2*ls, 0.3*ls, 0.2*ls, [1, 1, 1]))
         laserShooterG.push(new webgl.Box(0*ls, (1-0.875)*ls, 0*ls, 0.2*ls, 0.3*ls, 0.8*ls, [1, 1, 1]))
         laserShooterG[2].rot.x = Math.PI/4
@@ -34,27 +34,14 @@ class AI extends Object3D {
         this.vel = {x: 0, y: 0, z: 0}
     }
     update() {
-        this.vel.x -= (1 - 0.95) * delta * this.vel.x * 100
-        this.vel.z -= (1 - 0.95) * delta * this.vel.z * 100
+        this.vel.x = lerp(this.vel.x, 0, (1-0.95)*delta*100)
+        this.vel.z = lerp(this.vel.z, 0, (1-0.95)*delta*100)
         this.vel.y -= aigravity * delta
 
-        this.cvel.x -= (1 - 0.95) * delta * this.cvel.x * 100
-        this.cvel.y -= (1 - 0.95) * delta * this.cvel.y * 100
+        this.cvel.x = lerp(this.cvel.x, 0, (1-0.95)*delta*100)
+        this.cvel.z = lerp(this.cvel.z, 0, (1-0.95)*delta*100)
 
         let moveDir = {x: 0, z: 0}
-
-        if (Math.random() < 10*delta) {
-            this.cvel.x -= 1*delta
-        }
-        if (Math.random() < 10*delta) {
-            this.cvel.x += 1*delta
-        }
-        if (Math.random() < 10*delta) {
-            this.cvel.y += 1*delta
-        }
-        if (Math.random() < 10*delta) {
-            this.cvel.y -= 1*delta
-        }
 
         this.camera.x += this.cvel.x
         this.camera.y += this.cvel.y
@@ -128,15 +115,15 @@ class AI extends Object3D {
             this.lsv = 6
             this.laserShooter.rot.x = 0
             let initialAngle = [this.camera.x + (Math.random()-0.5)*2*spread, this.camera.y + (Math.random()-0.5)*2*spread, camera.rot.z]
-            let rotated = rotVec({x: 0.65*this.ls, y: -0.4*this.ls, z: -1*this.ls}, this.camera.x, this.camera.y, camera.rot.z)
+            let rotated = rotv3({x: 0.65*this.ls, y: -0.4*this.ls, z: -1*this.ls}, this.camera)
             let lPoint = {x: this.pos.x+rotated.x, y: this.pos.y+0.35+rotated.y, z: this.pos.z+rotated.z}
-            let rotated2 = rotVec({x:0, y:0, z:-1}, ...initialAngle)
+            let rotated2 = rotv3({x:0, y:0, z:-1}, vec3(...initialAngle))
 
             let raycast = raycast3D(this.pos.x, this.pos.y, this.pos.z, rotated2.x, rotated2.y, rotated2.z, 100)
             let d = {x: raycast.point.x-lPoint.x, y: raycast.point.y-lPoint.y, z: raycast.point.z-lPoint.z}
             
             let len = Math.sqrt((raycast.point.x-lPoint.x)**2 + (raycast.point.z-lPoint.z)**2)
-            let rotated3 = rotVec({x:0, y:0, z:-1}, Math.atan2(d.y, len), -Math.atan2(d.z, d.x)-Math.PI/2, 0)
+            let rotated3 = rotv3({x:0, y:0, z:-1}, vec3(Math.atan2(d.y, len), -Math.atan2(d.z, d.x)-Math.PI/2, 0))
 
             let rLen = Math.sqrt(rotated3.x**2 + rotated3.y**2 + rotated3.z**2)
             let moveDir = {x: rotated3.x/rLen*100*aibulletSpeed, y: rotated3.y/rLen*100*aibulletSpeed, z: rotated3.z/rLen*100*aibulletSpeed}
@@ -182,7 +169,7 @@ class AI extends Object3D {
         }
     }
     checkCollide() {
-        return this.isColliding(boxes)
+        return collidingMap(this)
     }
     move(x, y, z, steps) {
         this.falling += delta

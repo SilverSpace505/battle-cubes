@@ -158,7 +158,7 @@ class Bullet extends Object3D {
                 return true
             }
         }
-        return this.isColliding(boxes)
+        return collidingMap(this)
     }
     move(x, y, z, steps) {
         this.falling += delta

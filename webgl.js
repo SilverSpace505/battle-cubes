@@ -608,11 +608,11 @@ class Webgl {
 				for (let mesh of this.meshes) {
 					mesh.oldPos = {...mesh.pos}
 					mesh.oldRot = {...mesh.rot}
-					let rotated = rotVec(mesh.pos, this.rot.x, this.rot.y, this.rot.z)
+					let rotated = rotv3(mesh.pos, this.rot)
 					if (this.isChild) {
-						rotated = rotVec(mesh.pos, this.oldRot.x+this.rot.x, this.oldRot.y+this.rot.y, this.oldRot.z+this.rot.z)
+						rotated = rotv3(mesh.pos, addv3(this.oldRot, this.rot))
 					}
-					mesh.pos = {x:rotated.x+this.pos.x, y:rotated.y+this.pos.y, z:rotated.z+this.pos.z}
+					mesh.pos = addv3(rotated, this.pos)
 					mesh.rot = {...this.rot}
 					mesh.customRot.push(...this.customRot)
 					mesh.customRot.push(

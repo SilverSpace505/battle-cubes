@@ -214,6 +214,59 @@ var players = {}
 
 var oldPass = ""
 
+var split = {}
+var samt = 4
+
+for (let x = 0; x < samt; x++) {
+    for (let z = 0; z < samt; z++) {
+        let p = [(x-samt/2+0.5)*2, (z-samt/2+0.5)*2]
+        split[p.join(",")] = []
+        // let sv = new webgl.Box(p[0]*(50/samt), 0, p[1]*(50/samt), 100/samt, 100, 100/samt, [0.5, 0.5, 0.5])
+        // sv.alpha = 0.5
+        // sv.oneSide = false
+    }
+}
+
+for (let box of boxes) {
+    for (let x = 0; x < samt; x++) {
+        for (let z = 0; z < samt; z++) {
+            let p = [(x-samt/2+0.5)*2, (z-samt/2+0.5)*2]
+            if (isColliding3D(p[0]*(50/samt), 0, p[1]*(50/samt), 100/samt, 100, 100/samt, box.pos.x, box.pos.y, box.pos.z, box.size.x, box.size.y, box.size.z)) {
+                split[p.join(",")].push(box)
+            }
+        }
+    }
+}
+
+function collidingMap(obj) {
+    for (let x = 0; x < samt; x++) {
+        for (let z = 0; z < samt; z++) {
+            let p = [(x-samt/2+0.5)*2, (z-samt/2+0.5)*2]
+            if (isColliding3D(p[0]*(50/samt), 0, p[1]*(50/samt), 100/samt, 100, 100/samt, obj.pos.x, obj.pos.y, obj.pos.z, obj.size.x, obj.size.y, obj.size.z)) {
+                if (obj.isColliding(split[p.join(",")])) {
+                    return true
+                }
+            }
+        }
+    }
+    return false
+}
+function collidingMap3D(x2, y2, z2, w, h, d) {
+    for (let x = 0; x < samt; x++) {
+        for (let z = 0; z < samt; z++) {
+            let p = [(x-samt/2+0.5)*2, (z-samt/2+0.5)*2]
+            if (isColliding3D(p[0]*(50/samt), 0, p[1]*(50/samt), 100/samt, 100, 100/samt, x2, y2, z2, w, h, d)) {
+                for (let box of split[p.join(",")]) {
+                    if (isColliding3D(x2, y2, z2, w, h, d, box.pos.x, box.pos.y, box.pos.z, box.size.x, box.size.y, box.size.z)) {
+                        return true
+                    }
+                }
+            }
+        }
+    }
+    return false
+}
+
 function clearBullets() {
     for (let bullet of player.bullets) {
         bullet.mesh.delete()
@@ -320,6 +373,8 @@ function gameTick() {
             vel = [0, 0, 0]
             rapidFire = false
             lifeTime = 1
+            colour = [0, 1, 1]
+            perShot = 1
             
             if (i == 1) {
                 // pistol
@@ -327,23 +382,29 @@ function gameTick() {
                 // sniper
                 bulletSpeed = 10
                 spread = 0
+                colour = [0, 0, 0]
             } else if (i == 3) {
                 // shotgun
-                rapidFire = true
+                perShot = 10
                 spread = 0.1
                 lifeTime = 0.2
                 bulletSpeed = 0.5
+                colour = [1, 0.5, 0]
             } else if (i == 4) {
                 // bee gun
                 drag = 0.1
                 bulletRandom = 100
-                bulletSpeed = 0.1
+                bulletSpeed = 0.5
+                homing = 25
+                lifeTime = 10
+                colour = [1, 1, 0]
             } else if (i == 5) {
                 // rocket launcher
                 vel[1] = -10
-                bulletSpeed = 0.1
+                bulletSpeed = 0.25
                 bulletSize = 0.5
                 lifeTime = 2
+                colour = [0, 1, 0]
             }
         }
     }
@@ -363,6 +424,9 @@ function gameTick() {
         players[player].pos.z += (playerData[player].z - players[player].pos.z) * delta * 10
         players[player].rot.y += (playerData[player].rot - players[player].rot.y) * delta * 10
         players[player].lso.rot.x += (playerData[player].rotx - players[player].lso.rot.x) * delta * 10
+        players[player].laserShooter.meshes[0].colour = playerData[player].colour
+        players[player].laserShooter.meshes[1].colour = playerData[player].colour
+        players[player].laserShooter.meshes[2].colour = playerData[player].colour
         players[player].updateModel()
     }
 
@@ -417,7 +481,7 @@ function gameTick() {
 
     isHost = lobbyData && lobbyData.host == id
 
-    uiA += (uiT - uiA) * delta * 10
+    uiA = lerp(uiA, uiT, delta*10)
 
     ctx.globalAlpha = 1-uiA
     ui.rect(canvas.width/2, canvas.height/2, 25, 2.5, [255, 255, 255, 1])
@@ -519,6 +583,7 @@ function gameTick() {
         z: player.pos.z,
         rot: camera.rot.y,
         rotx: camera.rot.x,
+        colour: colour,
     }
     if (isHost) {
         let poses = {}
@@ -543,10 +608,8 @@ function raycast3D(x, y, z, vx, vy, vz, maxD, stepD=0.1) {
                 return {d: Math.sqrt((r.x-x)**2 + (r.y-y)**2 + (r.z-z)**2), point: r}
             }
         }
-        for (let box of boxes) {
-            if (isColliding3D(r.x, r.y, r.z, r.s, r.s, r.s, box.pos.x, box.pos.y, box.pos.z, box.size.x, box.size.y, box.size.z)) {
-                return {d: Math.sqrt((r.x-x)**2 + (r.y-y)**2 + (r.z-z)**2), point: r}
-            }
+        if (collidingMap3D(r.x, r.y, r.z, r.s, r.s, r.s)) {
+            return {d: Math.sqrt((r.x-x)**2 + (r.y-y)**2 + (r.z-z)**2), point: r}
         }
     }
     return {d: Math.sqrt((r.x-x)**2 + (r.y-y)**2 + (r.z-z)**2), point: r}
