@@ -26,6 +26,7 @@ var homing = 0
 var vel = [0, 0, 0]
 var maxBullets = 250
 var perShot = 1
+var cooldown = 0.1
 
 var aigravity = 0.3 * 60
 var aispeed = 250

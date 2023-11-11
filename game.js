@@ -33,6 +33,9 @@ var passType = 0
 
 var bulletID = 1
 
+var selectedls = 0
+var lsnames = ["Pistol", "Sniper", "Shotgun", "Bee Gun", "Rocket Launcher"]
+
 function createBox(x, y, z, width, height, depth, colour, texture="none", doScale=true, uvMul=1) {
     let newBox = new webgl.Box(x, y, z, width, height, depth, colour)
     boxes.push(newBox)
@@ -344,10 +347,10 @@ function gameTick() {
 
     tFov = 60
     if (player.sprinting) {
-        tFov = 60*1.33
+        tFov = 60*1.2
     }
 
-    fov += (tFov - fov) * delta * 10
+    fov = lerp(fov, tFov, delta * 10)
 
     if (jKeys["Escape"]) {
         input.unlockMouse()
@@ -363,7 +366,9 @@ function gameTick() {
     }
 
     for (let i = 1; i < 6; i++) {
-        if (jKeys["Digit"+i]) {
+        if (jKeys["Digit"+i] && i != selectedls) {
+            selectedls = i
+            player.lsdown = 0.35
             bulletSize = 0.1
             bulletSpeed = 1
             homing = 0
@@ -371,10 +376,10 @@ function gameTick() {
             spread = 0.01
             drag = 0
             vel = [0, 0, 0]
-            rapidFire = false
             lifeTime = 1
             colour = [0, 1, 1]
             perShot = 1
+            cooldown = 0.1
             
             if (i == 1) {
                 // pistol
@@ -383,6 +388,7 @@ function gameTick() {
                 bulletSpeed = 10
                 spread = 0
                 colour = [0, 0, 0]
+                cooldown = 0.5
             } else if (i == 3) {
                 // shotgun
                 perShot = 10
@@ -390,6 +396,7 @@ function gameTick() {
                 lifeTime = 0.2
                 bulletSpeed = 0.5
                 colour = [1, 0.5, 0]
+                cooldown = 0.5
             } else if (i == 4) {
                 // bee gun
                 drag = 0.1
@@ -398,6 +405,7 @@ function gameTick() {
                 homing = 25
                 lifeTime = 10
                 colour = [1, 1, 0]
+                cooldown = 0.1
             } else if (i == 5) {
                 // rocket launcher
                 vel[1] = -10
@@ -405,6 +413,7 @@ function gameTick() {
                 bulletSize = 0.5
                 lifeTime = 2
                 colour = [0, 1, 0]
+                cooldown = 0.5
             }
         }
     }

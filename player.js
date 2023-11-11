@@ -7,6 +7,9 @@ class Player extends Object3D {
     bullets = []
     mesh = []
     ls = 0.75
+    sprinting = false
+    lsdown = 0
+    cooldown = 0
     constructor(x, y, z) {
         super(x, y, z, 0.75, 0.75, 0.75)
 
@@ -66,20 +69,36 @@ class Player extends Object3D {
             this.speed *= 2
         }
 
-        this.vel.x += moveDir.x * speed * delta
-        this.vel.z += moveDir.z * speed * delta
+        if (keys["ShiftLeft"]) {
+            this.vel.x += moveDir.x * speed * 2 * delta
+            this.vel.z += moveDir.z * speed * 2 * delta
+            this.sprinting = true
+        } else {
+            this.vel.x += moveDir.x * speed * delta
+            this.vel.z += moveDir.z * speed * delta
+            this.sprinting = false
+        }
+        
 
         if (this.sprinting) {
             this.speed /= 2
         }
 
+        this.lsdown -= delta
+        if (this.lsdown > 0) {
+            this.laserShooter.pos.y = lerp(this.laserShooter.pos.y, -1.2*this.ls, delta*10)
+        } else {
+            this.laserShooter.pos.y = lerp(this.laserShooter.pos.y, -0.4*this.ls, delta*10)
+        }
 
         if (jKeys["Space"] && this.falling < 0.1) {
             this.vel.y = jump
         }
         this.move(this.vel.x * delta, this.vel.y * delta, this.vel.z * delta, 1/delta)
 
-        if ((mouse.lclick || (rapidFire && mouse.ldown)) && isValid) {
+        this.cooldown -= delta
+        if (mouse.ldown && this.cooldown <= 0 && isValid) {
+            this.cooldown = cooldown
             for (let i = 0; i < perShot; i++) {
                 this.lsv = 6
                 this.laserShooter.rot.x = 0
