@@ -29,7 +29,7 @@ function connectToServer() {
     lobbies = {}
     lobbyData = {}
 	id = 0
-	ws = new WebSocket("wss://fps-game.glitch.me")
+	ws = new WebSocket("wss://battle-cubes.glitch.me")
 
     ws.addEventListener("open", (event) => {
         sendMsg({"connect": true}, true)
@@ -122,6 +122,9 @@ function connectToServer() {
                     ai.spawn()
                 }
             }
+        }
+        if (msg.clearBullets) {
+            clearBullets()
         }
     })
 

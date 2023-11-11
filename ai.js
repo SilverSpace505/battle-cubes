@@ -34,6 +34,14 @@ class AI extends Object3D {
         this.vel = {x: 0, y: 0, z: 0}
     }
     update() {
+
+        if (isNaN(this.camera.x)) {
+            this.camera = {x: 0, y: 0, z: 0}
+        }
+        if (isNaN(this.vel.x)) {
+            this.vel = {x: 0, y: 0, z: 0}
+        }
+
         this.vel.x = lerp(this.vel.x, 0, (1-0.95)*delta*100)
         this.vel.z = lerp(this.vel.z, 0, (1-0.95)*delta*100)
         this.vel.y -= aigravity * delta

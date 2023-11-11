@@ -27,6 +27,9 @@ loBackButton.bgColour = [255, 0, 0, 0.5]
 var privateButton = new ui.Button(0, 0, 0, 0, "rect", "Public")
 privateButton.bgColour = [0, 0, 0, 0.5]
 
+var antihackButton = new ui.Button(0, 0, 0, 0, "rect", "Antihack")
+antihackButton.bgColour = [0, 0, 0, 0.5]
+
 var passwordTo = new ui.TextBox(0, 0, 0, 0, "Password")
 
 var passType = 0
@@ -277,6 +280,64 @@ function clearBullets() {
     player.bullets = []
 }
 
+function setLaserShooter() {
+    speed = 250
+    jump = 7
+    gravity = 18
+    bulletSize = 0.1
+    bulletSpeed = 1
+    homing = 0
+    bulletRandom = 0
+    spread = 0.01
+    drag = 0
+    vel = [0, 0, 0]
+    lifeTime = 1
+    colour = [0, 1, 1]
+    perShot = 1
+    cooldown = 0.3
+    bounces = 0
+    
+    if (selectedls == 1) {
+        // pistol
+    } else if (selectedls == 2) {
+        // sniper
+        bulletSpeed = 10
+        spread = 0
+        colour = [0, 0, 0]
+        cooldown = 0.5
+    } else if (selectedls == 3) {
+        // shotgun
+        perShot = 10
+        spread = 0.1
+        lifeTime = 0.2
+        bulletSpeed = 0.5
+        colour = [1, 0.5, 0]
+        cooldown = 0.5
+    } else if (selectedls == 4) {
+        // machine gun
+        spread = 0.1
+        colour = [0, 0, 1]
+        cooldown = 0.05
+    }  else if (selectedls == 5) {
+        // bee gun
+        drag = 0.1
+        bulletRandom = 100
+        bulletSpeed = 0.5
+        homing = 25
+        lifeTime = 10
+        colour = [1, 1, 0]
+        cooldown = 0.1
+    } else if (selectedls == 6) {
+        // rocket launcher
+        vel[1] = -10
+        bulletSpeed = 0.25
+        bulletSize = 0.5
+        lifeTime = 2
+        colour = [0, 1, 0]
+        cooldown = 0.5
+    }
+}
+
 function gameTick() {
     time += delta
 
@@ -369,58 +430,12 @@ function gameTick() {
         if (jKeys["Digit"+i] && i != selectedls) {
             selectedls = i
             player.lsdown = 0.35
-            bulletSize = 0.1
-            bulletSpeed = 1
-            homing = 0
-            bulletRandom = 0
-            spread = 0.01
-            drag = 0
-            vel = [0, 0, 0]
-            lifeTime = 1
-            colour = [0, 1, 1]
-            perShot = 1
-            cooldown = 0.3
-            
-            if (i == 1) {
-                // pistol
-            } else if (i == 2) {
-                // sniper
-                bulletSpeed = 10
-                spread = 0
-                colour = [0, 0, 0]
-                cooldown = 0.5
-            } else if (i == 3) {
-                // shotgun
-                perShot = 10
-                spread = 0.1
-                lifeTime = 0.2
-                bulletSpeed = 0.5
-                colour = [1, 0.5, 0]
-                cooldown = 0.5
-            } else if (i == 4) {
-                // machine gun
-                spread = 0.1
-                colour = [0, 0, 1]
-                cooldown = 0.05
-            }  else if (i == 5) {
-                // bee gun
-                drag = 0.1
-                bulletRandom = 100
-                bulletSpeed = 0.5
-                homing = 25
-                lifeTime = 10
-                colour = [1, 1, 0]
-                cooldown = 0.1
-            } else if (i == 6) {
-                // rocket launcher
-                vel[1] = -10
-                bulletSpeed = 0.25
-                bulletSize = 0.5
-                lifeTime = 2
-                colour = [0, 1, 0]
-                cooldown = 0.5
-            }
+            setLaserShooter()
         }
+    }
+
+    if (lobby && lobbyData.antihack) {
+        setLaserShooter()
     }
 
     for (let i = 0; i < explosions.length; i++) {
@@ -554,7 +569,7 @@ function gameTick() {
             page = "main"
         }
 
-        privateButton.set(canvas.width/2, canvas.height/2 - 30*su, 400*su, 50*su)
+        privateButton.set(canvas.width/2, canvas.height/2 - 60*su, 400*su, 50*su)
         privateButton.textSize = 35*su
 
         if (lobbyData.private) {
@@ -572,7 +587,7 @@ function gameTick() {
             sendMsg({setOptions: {private: lobbyData.private}})
         }
 
-        passwordTo.set(canvas.width/2, canvas.height/2 + 30*su, 400*su, 50*su)
+        passwordTo.set(canvas.width/2, canvas.height/2, 400*su, 50*su)
         passwordTo.outlineSize = 10*su
         passwordTo.textSize = 35*su
 
@@ -585,6 +600,24 @@ function gameTick() {
             lobbyData.password = passwordTo.text
             passType = 1
             sendMsg({setOptions: {password: passwordTo.text}})
+        }
+
+
+        antihackButton.set(canvas.width/2, canvas.height/2 + 60*su, 400*su, 50*su)
+        antihackButton.textSize = 35*su
+        if (lobbyData.antihack) {
+            antihackButton.text = "Antihack"
+        } else {
+            antihackButton.text = "No Antihack"
+        }
+        
+        antihackButton.basic()
+        antihackButton.draw()
+
+        if (antihackButton.hovered() && mouse.lclick) {
+            antihackButton.click()
+            lobbyData.antihack = !lobbyData.antihack
+            sendMsg({setOptions: {antihack: lobbyData.antihack}, clearBullets: true})
         }
     }
 
