@@ -37,7 +37,7 @@ function connectToServer() {
 
     ws.addEventListener("message", (event) => {
         var msg = JSON.parse(event.data)
-        if (msg.id) {
+        if ("id" in msg) {
 			connected = true
 			console.log("Connected with id: " + msg.id)
 			id = msg.id
@@ -57,19 +57,19 @@ function connectToServer() {
             console.log("drag - makes the bullet slow down, negative numbers make it go faster [default:0]")
             console.log("maxBullets - the max amount of bullets [default:50]")
 		}
-        if (msg.lobbies) {
+        if ("lobbies" in msg) {
             lobbies = msg.lobbies
             // if (lobby) {
             //     lobbyData = lobbies[lobby]
             // }
             // console.log("Got some lobbies: " + JSON.stringify(msg.lobbies))
         }
-        if (msg.lobbyData && optType <= 0) {
+        if ("lobbyData" in msg && optType <= 0) {
             if (msg.lobbyData[1]) {
                 lobbyData = msg.lobbyData[1]
             }
         }
-        if (msg.joinedLobby) {
+        if ("joinedLobby" in msg) {
             lobbyLoading = false
             lobby = msg.joinedLobby
             showM("Joined lobby: " + lobby)
@@ -94,19 +94,19 @@ function connectToServer() {
             deaths = 0
             sendMsg({getLobby: true})
         }
-        if (msg.lobbyExists) {
+        if ("lobbyExists" in msg) {
             lobbyLoading = false
             showM("Lobby already exists")
         }
-        if (msg.lobbyDoesNotExist) {
+        if ("lobbyDoesNotExist" in msg) {
             lobbyLoading = false
             showM("Lobby does not exist")
         }
-        if (msg.notHost) {
+        if ("notHost" in msg) {
             lobbyLoading = false
             showM("You are not the host")
         }
-        if (msg.wrongPassword) {
+        if ("wrongPassword" in msg) {
             lobbyLoading = false
             if (!passUI) {
                 passUI = true
@@ -114,27 +114,27 @@ function connectToServer() {
                 showM("Wrong Password")
             }
         }
-        if (msg.data) {
+        if ("data" in msg) {
             playerData = msg.data
         }
-        if (msg.bullet) {
+        if ("bullet" in msg) {
             player.bullets.push(new Bullet(...msg.bullet))
         }
-        if (msg.hit) {
+        if ("hit" in msg) {
             isDead = true
             deaths += 1
         }
-        if (msg.aihit) {
+        if ("aihit" in msg) {
             for (let ai of ais) {
                 if (ai.id == msg.aihit) {
                     ai.spawn()
                 }
             }
         }
-        if (msg.clearBullets) {
+        if ("clearBullets" in msg) {
             clearBullets()
         }
-        if (msg.resetStats) {
+        if ("resetStats" in smg) {
             kills = 0
             deaths = 0
         }
