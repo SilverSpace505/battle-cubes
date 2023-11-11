@@ -37,12 +37,16 @@ var passwordTo = new ui.TextBox(0, 0, 0, 0, "Password")
 
 var aisTo = new ui.TextBox(0, 0, 0, 0, "AI's")
 
+var statsC = new ui.Canvas(0, 0, 0, 0, [0, 0, 0, 0.5])
+
 var optType = 0
 
 var bulletID = 1
 
 var kills = 0
 var deaths = 0
+
+var statsO = 0
 
 var selectedls = 1
 var lsnames = ["Pistol", "Sniper", "Shotgun", "Machine Gun", "Bee Gun", "Rocket Launcher"]
@@ -378,7 +382,6 @@ function gameTick() {
     }
     if (aisTo.text != oldAis) {
         optType = 1
-        console.log("changed")
         lobbyData.ais = aisTo.text
         sendMsg({setOptions: {ais: lobbyData.ais}})
     }  
@@ -437,6 +440,8 @@ function gameTick() {
             ai.pos.z = lerp(ai.pos.z, playerData[lobbyData.host].ais[ai.id.toString()][2], delta*10)
             ai.camera.x = lerp(ai.camera.x, playerData[lobbyData.host].ais[ai.id.toString()][3], delta*10)
             ai.camera.y = lerp(ai.camera.y, playerData[lobbyData.host].ais[ai.id.toString()][4], delta*10)
+            ai.kills = playerData[lobbyData.host].ais[ai.id.toString()][5]
+            ai.deaths = playerData[lobbyData.host].ais[ai.id.toString()][6]
         }
         ai.rot.y = ai.camera.y
         ai.lso.pos = {...ai.pos}
@@ -551,9 +556,56 @@ function gameTick() {
         sendMsg({getLobby: true})
     }
 
+    if (keys["ArrowDown"]) {
+        statsO += 10*delta
+    }
+    if (keys["ArrowUp"]) {
+        statsO -= 10*delta
+    }
+
     ui.text(canvas.width - 50*su, canvas.height - 50*su, 50*su, lsnames[selectedls-1], {align: "right"})
 
-    ui.rect(canvas.width/2, 100*su, 600*su, 200*su, [0, 0, 0, 0.5])
+    statsC.set(canvas.width/2, 105*su+20*su, 600*su, 210*su-40*su)
+    
+    ui.rect(canvas.width/2, 110*su, 600*su, 220*su, [0, 0, 0, 0.5])
+
+    ui.text(canvas.width/2-300*su+10*su, 20*su, 20*su, "Kills")
+    ui.text(canvas.width/2, 20*su, 20*su, "Username", {align: "center"})
+    ui.text(canvas.width/2+300*su-10*su, 20*su, 20*su, "Deaths", {align: "right"})
+
+    ui.setC(statsC)
+
+    // ui.rect(canvas.width/2, 100*su, 600*su, 200*su, [0, 0, 0, 0.5])
+
+   
+
+    let scores = []
+    for (let player in playerData) {
+        scores.push([playerData[player].username ? playerData[player].username : "Unnamed", playerData[player].kills, playerData[player].deaths])
+    }
+    for (let ai of ais) {
+        scores.push(["AI " + -ai.id, ai.kills, ai.deaths])
+    }
+    scores.sort((a, b) => ((b[1]-b[2]) - (a[1]-a[2])))
+
+    if (statsO > scores.length-7) {
+        statsO = scores.length-7
+    }
+    if (statsO < 0) {
+        statsO = 0
+    }
+
+    let i = 0
+    for (let i2 = 0; i2 < scores.length; i2++) {
+        if (i2 < Math.floor(statsO)) { continue }
+        ui.rect(300*su, 10*su+(i2-statsO)*25*su, 580*su, 20*su, [0, 0, 0, 0.5])
+        ui.text(300*su, 10*su+(i2-statsO)*25*su, 20*su, scores[i2][0], {align: "center"})
+        ui.text(0*su+10*su, 10*su+(i2-statsO)*25*su, 20*su, scores[i2][1].toString(), {colour: [0, 255, 0, 1]})
+        ui.text(600*su-10*su, 10*su+(i2-statsO)*25*su, 20*su, scores[i2][2].toString(), {colour: [255, 0, 0, 1], align: "right"})
+        i++
+    }
+
+    ui.setC()
 
     isHost = lobbyData && lobbyData.host == id
 
@@ -681,6 +733,10 @@ function gameTick() {
         if (resetStatsButton.hovered() && mouse.lclick) {
             resetStatsButton.click()
             sendMsg({resetStats: true})
+            for (let ai of ais) {
+                ai.kills = 0
+                ai.deaths = 0
+            }
         }
     }
 
@@ -703,7 +759,7 @@ function gameTick() {
     if (isHost) {
         let poses = {}
         for (let ai of ais) {
-            poses[ai.id.toString()] = [ai.pos.x, ai.pos.y, ai.pos.z, ai.camera.x, ai.camera.y]
+            poses[ai.id.toString()] = [ai.pos.x, ai.pos.y, ai.pos.z, ai.camera.x, ai.camera.y, ai.kills, ai.deaths]
         }
         data["ais"] = poses
     }

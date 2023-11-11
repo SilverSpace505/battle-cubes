@@ -120,15 +120,24 @@ class Bullet extends Object3D {
             this.exists = false
         }
         
-        if (this.real || this.id < 0) {
+        if (this.real || (this.id < 0 && isHost)) {
             for (let player in players) {
                 if (this.isColliding([players[player]])) {
-                    kills += 1
+                    if (this.real) {
+                        kills += 1
+                    } else {
+                        ais[-this.id - 1].kills += 1
+                    }
                     sendMsg({hit: player})
                 }
             }
             for (let ai of ais) {
                 if (ai.id != this.id && this.isColliding([ai])) {
+                    if (this.real) {
+                        kills += 1
+                    } else {
+                        ais[-this.id - 1].kills += 1
+                    }
                     kills += 1
                     if (isHost) {
                         ai.spawn()
@@ -178,11 +187,15 @@ class Bullet extends Object3D {
                 }
                 this.bounces += 1
                 explosions.push(new Explosion(this.pos.x, this.pos.y, this.pos.z, f, this.colour))
-                if (this.real || this.id < 0) {
+                if (this.real || (this.id < 0 && isHost)) {
                     for (let player in players) {
                         if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, players[player].pos.x, players[player].pos.y, players[player].pos.z, players[player].size.x, players[player].size.y, players[player].size.z)) {
                             sendMsg({hit: player})
-                            kills += 1
+                            if (this.real) {
+                                kills += 1
+                            } else {
+                                ais[-this.id - 1].kills += 1
+                            }
                         }
                     }
                     if (this.id < 0) {
@@ -193,9 +206,14 @@ class Bullet extends Object3D {
                     }
                     for (let ai of ais) {
                         if (ai.id != this.id && isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, ai.pos.x, ai.pos.y, ai.pos.z, ai.size.x, ai.size.y, ai.size.z)) {
-                            kills += 1
+                            if (this.real) {
+                                kills += 1
+                            } else {
+                                ais[-this.id - 1].kills += 1
+                            }
                             if (isHost) {
                                 ai.spawn()
+                                ai.deaths += 1
                             } else {
                                 sendMsg({aihit: ai.id})
                             }
@@ -211,11 +229,15 @@ class Bullet extends Object3D {
                 this.vel.z *= -1
                 this.bounces += 1
                 explosions.push(new Explosion(this.pos.x, this.pos.y, this.pos.z, f, this.colour))
-                if (this.real || this.id < 0) {
+                if (this.real || (this.id < 0 && isHost)) {
                     for (let player in players) {
                         if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, players[player].pos.x, players[player].pos.y, players[player].pos.z, players[player].size.x, players[player].size.y, players[player].size.z)) {
                             sendMsg({hit: player})
-                            kills += 1
+                            if (this.real) {
+                                kills += 1
+                            } else {
+                                ais[-this.id - 1].kills += 1
+                            }
                         }
                     }
                     if (this.id < 0) {
@@ -226,9 +248,14 @@ class Bullet extends Object3D {
                     }
                     for (let ai of ais) {
                         if (ai.id != this.id && isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, ai.pos.x, ai.pos.y, ai.pos.z, ai.size.x, ai.size.y, ai.size.z)) {
-                            kills += 1
+                            if (this.real) {
+                                kills += 1
+                            } else {
+                                ais[-this.id - 1].kills += 1
+                            }
                             if (isHost) {
                                 ai.spawn()
+                                ai.deaths += 1
                             } else {
                                 sendMsg({aihit: ai.id})
                             }
@@ -247,11 +274,15 @@ class Bullet extends Object3D {
                 }
                 this.bounces += 1
                 explosions.push(new Explosion(this.pos.x, this.pos.y, this.pos.z, f, this.colour))
-                if (this.real || this.id < 0) {
+                if (this.real || (this.id < 0 && isHost)) {
                     for (let player in players) {
                         if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, players[player].pos.x, players[player].pos.y, players[player].pos.z, players[player].size.x, players[player].size.y, players[player].size.z)) {
                             sendMsg({hit: player})
-                            kills += 1
+                            if (this.real) {
+                                kills += 1
+                            } else {
+                                ais[-this.id - 1].kills += 1
+                            }
                         }
                     }
                     if (this.id < 0) {
@@ -262,9 +293,14 @@ class Bullet extends Object3D {
                     }
                     for (let ai of ais) {
                         if (ai.id != this.id && isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, ai.pos.x, ai.pos.y, ai.pos.z, ai.size.x, ai.size.y, ai.size.z)) {
-                            kills += 1
+                            if (this.real) {
+                                kills += 1
+                            } else {
+                                ais[-this.id - 1].kills += 1
+                            }
                             if (isHost) {
                                 ai.spawn()
+                                ai.deaths += 1
                             } else {
                                 sendMsg({aihit: ai.id})
                             }

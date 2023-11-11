@@ -77,14 +77,17 @@ function connectToServer() {
             overlayT = 1
             player.spawn()
             for (let ai of ais) {
-                ai.spawn()
+                ai.delete()
             }
+            ais = []
             clearBullets()
             uiA = 0
             camera.rot = {x: 0, y: 0, z: 0}
             input.lockMouse()
             passwordTo.text = ""
             passUI = false
+            kills = 0
+            deaths = 0
             sendMsg({getLobby: true})
         }
         if (msg.lobbyExists) {

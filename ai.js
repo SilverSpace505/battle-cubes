@@ -10,6 +10,8 @@ class AI extends Object3D {
     camera = {x: 0, y: 0, z: 0}
     cvel = {x: 0, y: 0}
     id = 0
+    kills = 0
+    deaths = 0
     constructor(x, y, z) {
         super(x, y, z, 0.75, 0.75, 0.75)
 
