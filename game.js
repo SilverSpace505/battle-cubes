@@ -33,8 +33,8 @@ var passType = 0
 
 var bulletID = 1
 
-var selectedls = 0
-var lsnames = ["Pistol", "Sniper", "Shotgun", "Bee Gun", "Rocket Launcher"]
+var selectedls = 1
+var lsnames = ["Pistol", "Sniper", "Shotgun", "Machine Gun", "Bee Gun", "Rocket Launcher"]
 
 function createBox(x, y, z, width, height, depth, colour, texture="none", doScale=true, uvMul=1) {
     let newBox = new webgl.Box(x, y, z, width, height, depth, colour)
@@ -365,7 +365,7 @@ function gameTick() {
         }
     }
 
-    for (let i = 1; i < 6; i++) {
+    for (let i = 1; i < 7; i++) {
         if (jKeys["Digit"+i] && i != selectedls) {
             selectedls = i
             player.lsdown = 0.35
@@ -379,7 +379,7 @@ function gameTick() {
             lifeTime = 1
             colour = [0, 1, 1]
             perShot = 1
-            cooldown = 0.1
+            cooldown = 0.3
             
             if (i == 1) {
                 // pistol
@@ -398,6 +398,11 @@ function gameTick() {
                 colour = [1, 0.5, 0]
                 cooldown = 0.5
             } else if (i == 4) {
+                // machine gun
+                spread = 0.1
+                colour = [0, 0, 1]
+                cooldown = 0.05
+            }  else if (i == 5) {
                 // bee gun
                 drag = 0.1
                 bulletRandom = 100
@@ -406,7 +411,7 @@ function gameTick() {
                 lifeTime = 10
                 colour = [1, 1, 0]
                 cooldown = 0.1
-            } else if (i == 5) {
+            } else if (i == 6) {
                 // rocket launcher
                 vel[1] = -10
                 bulletSpeed = 0.25
@@ -487,6 +492,8 @@ function gameTick() {
         fetchC = 3
         sendMsg({getLobby: true})
     }
+
+    ui.text(canvas.width - 50*su, canvas.height - 50*su, 50*su, lsnames[selectedls-1], {align: "right"})
 
     isHost = lobbyData && lobbyData.host == id
 
