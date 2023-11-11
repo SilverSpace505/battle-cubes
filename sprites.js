@@ -148,7 +148,7 @@ class Bullet extends Object3D {
             }
             if (this.id < 0) {
                 if (this.isColliding([player])) {
-                    player.spawn()
+                    isDead = true
                     deaths += 1
                 }
             }
@@ -200,7 +200,7 @@ class Bullet extends Object3D {
                     }
                     if (this.id < 0) {
                         if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, player.pos.x, player.pos.y, player.pos.z, player.size.x, player.size.y, player.size.z)) {
-                            player.spawn()
+                            isDead = true
                             deaths += 1
                         }
                     }
@@ -242,7 +242,7 @@ class Bullet extends Object3D {
                     }
                     if (this.id < 0) {
                         if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, player.pos.x, player.pos.y, player.pos.z, player.size.x, player.size.y, player.size.z)) {
-                            player.spawn()
+                            isDead = true
                             deaths += 1
                         }
                     }
@@ -287,7 +287,7 @@ class Bullet extends Object3D {
                     }
                     if (this.id < 0) {
                         if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, player.pos.x, player.pos.y, player.pos.z, player.size.x, player.size.y, player.size.z)) {
-                            player.spawn()
+                            isDead = true
                             deaths += 1
                         }
                     }

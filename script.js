@@ -77,7 +77,7 @@ input.mouseMove = (event) => {
             this.mouse.x = event.clientX
             this.mouse.y = event.clientY
         }
-    } else {
+    } else if (!isDead) {
         camera.rot.x -= event.movementY*sensitivity
 		if (camera.rot.x > Math.PI/2*0.99) {
 			camera.rot.x = Math.PI/2*0.99

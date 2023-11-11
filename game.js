@@ -18,6 +18,9 @@ function srand(seed) {
 var menuButton = new ui.Button(0, 0, 0, 0, "rect", "Menu")
 menuButton.bgColour = [0, 0, 0, 0.5]
 
+var respawnButton = new ui.Button(0, 0, 0, 0, "rect", "Respawn")
+respawnButton.bgColour = [0, 0, 0, 0.5]
+
 var lobbyOButton = new ui.Button(0, 0, 0, 0, "rect", "Lobby Options")
 lobbyOButton.bgColour = [0, 0, 0, 0.5]
 
@@ -35,7 +38,7 @@ resetStatsButton.bgColour = [255, 0, 0, 0.5]
 
 var passwordTo = new ui.TextBox(0, 0, 0, 0, "Password")
 
-var aisTo = new ui.TextBox(0, 0, 0, 0, "AI's")
+var aisTo = new ui.TextBox(0, 0, 0, 0, "AIs")
 
 var statsC = new ui.Canvas(0, 0, 0, 0, [0, 0, 0, 0.5])
 
@@ -47,6 +50,9 @@ var kills = 0
 var deaths = 0
 
 var statsO = 0
+
+var isDead = false
+var deadA = 0
 
 var selectedls = 1
 var lsnames = ["Pistol", "Sniper", "Shotgun", "Machine Gun", "Bee Gun", "Rocket Launcher"]
@@ -406,15 +412,23 @@ function gameTick() {
     
     isValid = !(Math.abs(mouse.x-canvas.width/2) < 300*su && Math.abs(mouse.y-canvas.height/2) < 250*su) || input.isMouseLocked()
     
-    if (mouse.lclick && isValid && !input.isMouseLocked()) {
+    if (mouse.lclick && isValid && !input.isMouseLocked() && !isDead) {
         input.lockMouse()
         mouse.lclick = false
     }
 
     optType -= delta
 
-    player.update()
-    camera.pos = {x:player.pos.x, y:player.pos.y+0.3, z:player.pos.z}
+    if (!isDead) {
+        player.update()
+        camera.pos = {x:player.pos.x, y:player.pos.y+0.3, z:player.pos.z}
+    } else {
+        page = "main"
+        player.pos = {x: 0, y: -1000, z: 0}
+        player.lsdown = 1
+        player.updateNeeded()
+        input.unlockMouse()
+    }
 
     player.updateModel()
 
@@ -422,6 +436,12 @@ function gameTick() {
     player.lso.rot = {...camera.rot}
     player.lso.update()
     player.laserShooter.update()
+
+    if (isDead) {
+        deadA = lerp(deadA, 1, delta*10)
+    } else {
+        deadA = lerp(deadA, 0, delta*10)
+    }
 
     for (let player in players) {
         players[player].lso.pos = {...players[player].pos}
@@ -563,7 +583,9 @@ function gameTick() {
         statsO -= 10*delta
     }
 
+    ctx.globalAlpha = 1 - deadA
     ui.text(canvas.width - 50*su, canvas.height - 50*su, 50*su, lsnames[selectedls-1], {align: "right"})
+    ctx.globalAlpha = 1
 
     statsC.set(canvas.width/2, 105*su+20*su, 600*su, 210*su-40*su)
     
@@ -598,6 +620,7 @@ function gameTick() {
     let i = 0
     for (let i2 = 0; i2 < scores.length; i2++) {
         if (i2 < Math.floor(statsO)) { continue }
+        if (isNaN(scores[i2][1])) { continue }
         ui.rect(300*su, 10*su+(i2-statsO)*25*su, 580*su, 20*su, [0, 0, 0, 0.5])
         ui.text(300*su, 10*su+(i2-statsO)*25*su, 20*su, scores[i2][0], {align: "center"})
         ui.text(0*su+10*su, 10*su+(i2-statsO)*25*su, 20*su, scores[i2][1].toString(), {colour: [0, 255, 0, 1]})
@@ -624,11 +647,30 @@ function gameTick() {
     if (page == "main") {
         ui.rect(canvas.width/2, canvas.height/2, 450*su, 400*su, [0, 0, 0, 0.5])
 
-        ui.text(canvas.width/2, canvas.height/2-125*su, 75*su, "Paused", {align: "center"})
+        if (isDead) {
+            ui.text(canvas.width/2, canvas.height/2-125*su, 75*su, "You Died", {align: "center"})
+            menuButton.set(canvas.width/2, canvas.height/2+110*su, 400*su, 100*su)
+        } else {
+            ui.text(canvas.width/2, canvas.height/2-125*su, 75*su, "Paused", {align: "center"})
+            menuButton.set(canvas.width/2, canvas.height/2, 400*su, 100*su)
+        }
         
-        menuButton.set(canvas.width/2, canvas.height/2, 400*su, 100*su)
         menuButton.textSize = 75*su
         menuButton.draw()
+
+        if (isDead) {
+            respawnButton.set(canvas.width/2, canvas.height/2, 400*su, 100*su)
+            respawnButton.textSize = 75*su
+            respawnButton.draw()
+            respawnButton.basic()
+            if (respawnButton.hovered() && mouse.lclick) {
+                respawnButton.click()
+                isDead = false
+                player.spawn()
+                player.lsdown = 0
+                input.lockMouse()
+            }
+        }
 
         if (uiT == 1) {
             menuButton.basic()
@@ -640,7 +682,7 @@ function gameTick() {
             }
         }
 
-        if (lobbyData && lobbyData.host == id) {
+        if (lobbyData && lobbyData.host == id && !isDead) {
             lobbyOButton.set(canvas.width/2, canvas.height/2+110*su, 400*su, 100*su)
             lobbyOButton.textSize = 50*su
             lobbyOButton.draw()

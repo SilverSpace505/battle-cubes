@@ -84,13 +84,6 @@ class Player extends Object3D {
             this.speed /= 2
         }
 
-        this.lsdown -= delta
-        if (this.lsdown > 0) {
-            this.laserShooter.pos.y = lerp(this.laserShooter.pos.y, -1.2*this.ls, delta*10)
-        } else {
-            this.laserShooter.pos.y = lerp(this.laserShooter.pos.y, -0.4*this.ls, delta*10)
-        }
-
         if (jKeys["Space"] && this.falling < 0.1) {
             this.vel.y = jump
         }
@@ -126,14 +119,7 @@ class Player extends Object3D {
             }
         }
 
-        for (let i = 0; i < this.bullets.length; i++) {
-            this.bullets[i].update()
-            if (!this.bullets[i].exists || i < this.bullets.length-maxBullets) {
-                this.bullets[i].mesh.delete()
-                this.bullets.splice(i, 1)
-                i--
-            }
-        }
+        this.updateNeeded()
 
         this.rot.y = camera.rot.y
         this.mesh.visible = false
@@ -147,7 +133,24 @@ class Player extends Object3D {
         }
 
         if (this.pos.y < -10) {
-            this.spawn()
+            isDead = true
+            deaths += 1
+        }
+    }
+    updateNeeded() {
+        this.lsdown -= delta
+        if (this.lsdown > 0) {
+            this.laserShooter.pos.y = lerp(this.laserShooter.pos.y, -1.2*this.ls, delta*10)
+        } else {
+            this.laserShooter.pos.y = lerp(this.laserShooter.pos.y, -0.4*this.ls, delta*10)
+        }
+        for (let i = 0; i < this.bullets.length; i++) {
+            this.bullets[i].update()
+            if (!this.bullets[i].exists || i < this.bullets.length-maxBullets) {
+                this.bullets[i].mesh.delete()
+                this.bullets.splice(i, 1)
+                i--
+            }
         }
     }
     updateModel() {

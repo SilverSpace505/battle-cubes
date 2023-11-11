@@ -87,6 +87,10 @@ function connectToServer() {
             passwordTo.text = ""
             passUI = false
             kills = 0
+            isDead = false
+            deadA = 0
+            player.lsdown = 0
+            player.laserShooter.pos.y = -0.4*player.ls
             deaths = 0
             sendMsg({getLobby: true})
         }
@@ -117,7 +121,7 @@ function connectToServer() {
             player.bullets.push(new Bullet(...msg.bullet))
         }
         if (msg.hit) {
-            player.spawn()
+            isDead = true
             deaths += 1
         }
         if (msg.aihit) {
