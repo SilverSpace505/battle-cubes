@@ -102,8 +102,9 @@ input.checkInputs = (event) => {
             cLobbyName.checkFocus(event)
             privateTo.checkFocus(event)
         }
-    } else if (scene == "game" && page == "lobbyO") {
+    } else if (scene == "game" && page == "lobbyO" && !input.isMouseLocked()) {
         passwordTo.checkFocus(event)
+        aisTo.checkFocus(event)
     } else if (scene == "menu") {
         usernameTo.checkFocus(event)
     }

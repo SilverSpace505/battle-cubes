@@ -35,7 +35,9 @@ resetStatsButton.bgColour = [255, 0, 0, 0.5]
 
 var passwordTo = new ui.TextBox(0, 0, 0, 0, "Password")
 
-var passType = 0
+var aisTo = new ui.TextBox(0, 0, 0, 0, "AI's")
+
+var optType = 0
 
 var bulletID = 1
 
@@ -225,6 +227,7 @@ var paused = false
 var players = {}
 
 var oldPass = ""
+var oldAis = ""
 
 var split = {}
 var samt = 4
@@ -307,7 +310,7 @@ function setLaserShooter() {
         // pistol
     } else if (selectedls == 2) {
         // sniper
-        bulletSpeed = 10
+        bulletSpeed = 5
         spread = 0
         colour = [0, 0, 0]
         cooldown = 0.5
@@ -363,7 +366,40 @@ function gameTick() {
             }
         }
     }
+    
+    if (isNaN(parseInt(aisTo.text))) {
+        aisTo.text = ""
+    }
+    if (parseInt(aisTo.text) < 0) {
+        aisTo.text = "0"
+    }
+    if (parseInt(aisTo.text) > 25) {
+        aisTo.text = "25"
+    }
+    if (aisTo.text != oldAis) {
+        optType = 1
+        console.log("changed")
+        lobbyData.ais = aisTo.text
+        sendMsg({setOptions: {ais: lobbyData.ais}})
+    }  
+    oldAis = aisTo.text
+    aisTo.text = lobbyData.ais
 
+    let amt = parseInt(lobbyData.ais)
+    if (isNaN(amt)) {
+        amt = 0
+    }
+    while (ais.length > amt) {
+        ais[0].delete()
+        ais.splice(0, 1)
+    }
+    while (ais.length < amt) {
+        ais.push(new AI(0, 1, 0))
+        ais[ais.length-1].spawn()
+    }
+    for (let i in ais) {
+        ais[i].id = -i - 1
+    }
     
     isValid = !(Math.abs(mouse.x-canvas.width/2) < 300*su && Math.abs(mouse.y-canvas.height/2) < 250*su) || input.isMouseLocked()
     
@@ -372,7 +408,7 @@ function gameTick() {
         mouse.lclick = false
     }
 
-    passType -= delta
+    optType -= delta
 
     player.update()
     camera.pos = {x:player.pos.x, y:player.pos.y+0.3, z:player.pos.z}
@@ -395,12 +431,12 @@ function gameTick() {
     for (let ai of ais) {
         if (isHost) {
             ai.update()
-        } else if (lobbyData && lobbyData.host && playerData[lobbyData.host] && playerData[lobbyData.host].ais) {
-            ai.pos.x += (playerData[lobbyData.host].ais[ai.id.toString()][0] - ai.pos.x) * delta * 10
-            ai.pos.y += (playerData[lobbyData.host].ais[ai.id.toString()][1] - ai.pos.y) * delta * 10
-            ai.pos.z += (playerData[lobbyData.host].ais[ai.id.toString()][2] - ai.pos.z) * delta * 10
-            ai.camera.x += (playerData[lobbyData.host].ais[ai.id.toString()][3] - ai.camera.x) * delta * 10
-            ai.camera.y += (playerData[lobbyData.host].ais[ai.id.toString()][4] - ai.camera.y) * delta * 10
+        } else if (lobbyData && lobbyData.host && playerData[lobbyData.host] && playerData[lobbyData.host].ais && playerData[lobbyData.host].ais[ai.id.toString()]) {
+            ai.pos.x = lerp(ai.pos.x, playerData[lobbyData.host].ais[ai.id.toString()][0], delta*10)
+            ai.pos.y = lerp(ai.pos.y, playerData[lobbyData.host].ais[ai.id.toString()][1], delta*10)
+            ai.pos.z = lerp(ai.pos.z, playerData[lobbyData.host].ais[ai.id.toString()][2], delta*10)
+            ai.camera.x = lerp(ai.camera.x, playerData[lobbyData.host].ais[ai.id.toString()][3], delta*10)
+            ai.camera.y = lerp(ai.camera.y, playerData[lobbyData.host].ais[ai.id.toString()][4], delta*10)
         }
         ai.rot.y = ai.camera.y
         ai.lso.pos = {...ai.pos}
@@ -454,14 +490,15 @@ function gameTick() {
     }
 
     for (let player in players) {
-        players[player].pos.x += (playerData[player].x - players[player].pos.x) * delta * 10
-        players[player].pos.y += (playerData[player].y - players[player].pos.y) * delta * 10
-        players[player].pos.z += (playerData[player].z - players[player].pos.z) * delta * 10
-        players[player].rot.y += (playerData[player].rot - players[player].rot.y) * delta * 10
-        players[player].lso.rot.x += (playerData[player].rotx - players[player].lso.rot.x) * delta * 10
+        players[player].pos.x = lerp(players[player].pos.x, playerData[player].x, delta*10)
+        players[player].pos.y = lerp(players[player].pos.y, playerData[player].y, delta*10)
+        players[player].pos.z = lerp(players[player].pos.z, playerData[player].z, delta*10)
+        players[player].rot.y = lerp(players[player].rot.y, playerData[player].rot, delta*10)
+        players[player].lso.rot.x = lerp(players[player].lso.rot.x, playerData[player].rotx, delta*10)
         players[player].laserShooter.meshes[0].colour = playerData[player].colour
         players[player].laserShooter.meshes[1].colour = playerData[player].colour
         players[player].laserShooter.meshes[2].colour = playerData[player].colour
+        players[player].mesh.colour = playerData[player].colour
         players[player].updateModel()
     }
 
@@ -566,7 +603,7 @@ function gameTick() {
         ui.rect(canvas.width/2, canvas.height/2, 600*su, 500*su, [0, 0, 0, 0.5])
         ui.text(canvas.width/2, canvas.height/2-200*su, 50*su, "Lobby Options", {align: "center"})
 
-        loBackButton.set(canvas.width/2, canvas.height/2+200*su, 400*su, 50*su)
+        loBackButton.set(canvas.width/2, canvas.height/2+300*su-100*su, 400*su, 50*su)
         loBackButton.textSize = 35*su
 
         loBackButton.basic()
@@ -577,7 +614,7 @@ function gameTick() {
             page = "main"
         }
 
-        privateButton.set(canvas.width/2, canvas.height/2 - 90*su, 400*su, 50*su)
+        privateButton.set(canvas.width/2, canvas.height/2 - 120*su, 400*su, 50*su)
         privateButton.textSize = 35*su
 
         if (lobbyData.private) {
@@ -595,7 +632,7 @@ function gameTick() {
             sendMsg({setOptions: {private: lobbyData.private}})
         }
 
-        passwordTo.set(canvas.width/2, canvas.height/2 - 30*su, 400*su, 50*su)
+        passwordTo.set(canvas.width/2, canvas.height/2 - 60*su, 400*su, 50*su)
         passwordTo.outlineSize = 10*su
         passwordTo.textSize = 35*su
 
@@ -606,12 +643,12 @@ function gameTick() {
 
         if (passwordTo.text != oldPass) {
             lobbyData.password = passwordTo.text
-            passType = 1
+            optType = 1
             sendMsg({setOptions: {password: passwordTo.text}})
         }
 
 
-        antihackButton.set(canvas.width/2, canvas.height/2 + 30*su, 400*su, 50*su)
+        antihackButton.set(canvas.width/2, canvas.height/2 + 0*su, 400*su, 50*su)
         antihackButton.textSize = 35*su
         if (lobbyData.antihack) {
             antihackButton.text = "Antihack"
@@ -628,7 +665,14 @@ function gameTick() {
             sendMsg({setOptions: {antihack: lobbyData.antihack}, clearBullets: true})
         }
 
-        resetStatsButton.set(canvas.width/2, canvas.height/2 + 90*su, 400*su, 50*su)
+        aisTo.set(canvas.width/2, canvas.height/2 + 60*su, 400*su, 50*su)
+        aisTo.textSize = 35*su
+        aisTo.outlineSize = 10*su
+        
+        aisTo.hover()
+        aisTo.draw()
+
+        resetStatsButton.set(canvas.width/2, canvas.height/2 + 120*su, 400*su, 50*su)
         resetStatsButton.textSize = 35*su
         
         resetStatsButton.basic()
