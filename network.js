@@ -115,6 +115,7 @@ function connectToServer() {
         }
         if (msg.hit) {
             player.spawn()
+            deaths += 1
         }
         if (msg.aihit) {
             for (let ai of ais) {
@@ -125,6 +126,10 @@ function connectToServer() {
         }
         if (msg.clearBullets) {
             clearBullets()
+        }
+        if (msg.resetStats) {
+            kills = 0
+            deaths = 0
         }
     })
 

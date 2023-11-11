@@ -11,6 +11,8 @@ var tScene = "menu"
 var overlayA = 0
 var overlayT = 0
 
+var username = ""
+
 function lerp(start, end, multiply) {
     if (multiply > 1) multiply = 1
     if (multiply < 0) multiply = 0
@@ -102,6 +104,8 @@ input.checkInputs = (event) => {
         }
     } else if (scene == "game" && page == "lobbyO") {
         passwordTo.checkFocus(event)
+    } else if (scene == "menu") {
+        usernameTo.checkFocus(event)
     }
 	
 

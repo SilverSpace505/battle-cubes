@@ -123,11 +123,13 @@ class Bullet extends Object3D {
         if (this.real || this.id < 0) {
             for (let player in players) {
                 if (this.isColliding([players[player]])) {
+                    kills += 1
                     sendMsg({hit: player})
                 }
             }
             for (let ai of ais) {
                 if (ai.id != this.id && this.isColliding([ai])) {
+                    kills += 1
                     if (isHost) {
                         ai.spawn()
                     } else {
@@ -138,6 +140,7 @@ class Bullet extends Object3D {
             if (this.id < 0) {
                 if (this.isColliding([player])) {
                     player.spawn()
+                    deaths += 1
                 }
             }
         }
@@ -179,15 +182,18 @@ class Bullet extends Object3D {
                     for (let player in players) {
                         if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, players[player].pos.x, players[player].pos.y, players[player].pos.z, players[player].size.x, players[player].size.y, players[player].size.z)) {
                             sendMsg({hit: player})
+                            kills += 1
                         }
                     }
                     if (this.id < 0) {
                         if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, player.pos.x, player.pos.y, player.pos.z, player.size.x, player.size.y, player.size.z)) {
                             player.spawn()
+                            deaths += 1
                         }
                     }
                     for (let ai of ais) {
                         if (ai.id != this.id && isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, ai.pos.x, ai.pos.y, ai.pos.z, ai.size.x, ai.size.y, ai.size.z)) {
+                            kills += 1
                             if (isHost) {
                                 ai.spawn()
                             } else {
@@ -209,15 +215,18 @@ class Bullet extends Object3D {
                     for (let player in players) {
                         if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, players[player].pos.x, players[player].pos.y, players[player].pos.z, players[player].size.x, players[player].size.y, players[player].size.z)) {
                             sendMsg({hit: player})
+                            kills += 1
                         }
                     }
                     if (this.id < 0) {
                         if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, player.pos.x, player.pos.y, player.pos.z, player.size.x, player.size.y, player.size.z)) {
                             player.spawn()
+                            deaths += 1
                         }
                     }
                     for (let ai of ais) {
                         if (ai.id != this.id && isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, ai.pos.x, ai.pos.y, ai.pos.z, ai.size.x, ai.size.y, ai.size.z)) {
+                            kills += 1
                             if (isHost) {
                                 ai.spawn()
                             } else {
@@ -242,15 +251,18 @@ class Bullet extends Object3D {
                     for (let player in players) {
                         if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, players[player].pos.x, players[player].pos.y, players[player].pos.z, players[player].size.x, players[player].size.y, players[player].size.z)) {
                             sendMsg({hit: player})
+                            kills += 1
                         }
                     }
                     if (this.id < 0) {
                         if (isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, player.pos.x, player.pos.y, player.pos.z, player.size.x, player.size.y, player.size.z)) {
                             player.spawn()
+                            deaths += 1
                         }
                     }
                     for (let ai of ais) {
                         if (ai.id != this.id && isColliding3D(this.pos.x, this.pos.y, this.pos.z, f/10, f/10, f/10, ai.pos.x, ai.pos.y, ai.pos.z, ai.size.x, ai.size.y, ai.size.z)) {
+                            kills += 1
                             if (isHost) {
                                 ai.spawn()
                             } else {

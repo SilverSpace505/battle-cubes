@@ -5,6 +5,14 @@ playButton.bgColour = [0, 0, 0, 0.5]
 var instructionsButton = new ui.Button(0, 0, 0, 0, "rect", "Instructions")
 instructionsButton.bgColour = [0, 0, 0, 0.5]
 
+var usernameTo = new ui.TextBox(0, 0, 0, 0, "Username")
+
+let lusername = localStorage.getItem("username")
+if (lusername) {
+    username = lusername
+    usernameTo.text = lusername
+}
+
 function menuTick() {
     let aspect = 2906/1621
     let bgSize = {x: canvas.height*aspect, y: canvas.width/aspect}
@@ -59,4 +67,16 @@ function menuTick() {
         instructionsButton.click()
         overlayT = 1
     }
+
+    usernameTo.set(canvas.width/2, canvas.height/2+130*su, 300*su, 30*su)
+    usernameTo.outlineSize = 10*su
+
+    usernameTo.text = usernameTo.text.substring(0, 14)
+
+    usernameTo.hover()
+    usernameTo.draw()
+
+    username = usernameTo.text
+
+    localStorage.setItem("username", username)
 }

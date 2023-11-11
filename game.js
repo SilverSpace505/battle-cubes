@@ -30,11 +30,17 @@ privateButton.bgColour = [0, 0, 0, 0.5]
 var antihackButton = new ui.Button(0, 0, 0, 0, "rect", "Antihack")
 antihackButton.bgColour = [0, 0, 0, 0.5]
 
+var resetStatsButton = new ui.Button(0, 0, 0, 0, "rect", "Reset Stats")
+resetStatsButton.bgColour = [255, 0, 0, 0.5]
+
 var passwordTo = new ui.TextBox(0, 0, 0, 0, "Password")
 
 var passType = 0
 
 var bulletID = 1
+
+var kills = 0
+var deaths = 0
 
 var selectedls = 1
 var lsnames = ["Pistol", "Sniper", "Shotgun", "Machine Gun", "Bee Gun", "Rocket Launcher"]
@@ -510,6 +516,8 @@ function gameTick() {
 
     ui.text(canvas.width - 50*su, canvas.height - 50*su, 50*su, lsnames[selectedls-1], {align: "right"})
 
+    ui.rect(canvas.width/2, 100*su, 600*su, 200*su, [0, 0, 0, 0.5])
+
     isHost = lobbyData && lobbyData.host == id
 
     uiA = lerp(uiA, uiT, delta*10)
@@ -569,7 +577,7 @@ function gameTick() {
             page = "main"
         }
 
-        privateButton.set(canvas.width/2, canvas.height/2 - 60*su, 400*su, 50*su)
+        privateButton.set(canvas.width/2, canvas.height/2 - 90*su, 400*su, 50*su)
         privateButton.textSize = 35*su
 
         if (lobbyData.private) {
@@ -587,7 +595,7 @@ function gameTick() {
             sendMsg({setOptions: {private: lobbyData.private}})
         }
 
-        passwordTo.set(canvas.width/2, canvas.height/2, 400*su, 50*su)
+        passwordTo.set(canvas.width/2, canvas.height/2 - 30*su, 400*su, 50*su)
         passwordTo.outlineSize = 10*su
         passwordTo.textSize = 35*su
 
@@ -603,7 +611,7 @@ function gameTick() {
         }
 
 
-        antihackButton.set(canvas.width/2, canvas.height/2 + 60*su, 400*su, 50*su)
+        antihackButton.set(canvas.width/2, canvas.height/2 + 30*su, 400*su, 50*su)
         antihackButton.textSize = 35*su
         if (lobbyData.antihack) {
             antihackButton.text = "Antihack"
@@ -619,6 +627,17 @@ function gameTick() {
             lobbyData.antihack = !lobbyData.antihack
             sendMsg({setOptions: {antihack: lobbyData.antihack}, clearBullets: true})
         }
+
+        resetStatsButton.set(canvas.width/2, canvas.height/2 + 90*su, 400*su, 50*su)
+        resetStatsButton.textSize = 35*su
+        
+        resetStatsButton.basic()
+        resetStatsButton.draw()
+
+        if (resetStatsButton.hovered() && mouse.lclick) {
+            resetStatsButton.click()
+            sendMsg({resetStats: true})
+        }
     }
 
     passwordTo.text = lobbyData.password
@@ -633,6 +652,9 @@ function gameTick() {
         rot: camera.rot.y,
         rotx: camera.rot.x,
         colour: colour,
+        kills: kills,
+        deaths: deaths,
+        username: username,
     }
     if (isHost) {
         let poses = {}
