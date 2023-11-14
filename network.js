@@ -134,7 +134,7 @@ function connectToServer() {
         if ("clearBullets" in msg) {
             clearBullets()
         }
-        if ("resetStats" in smg) {
+        if ("resetStats" in msg) {
             kills = 0
             deaths = 0
         }
