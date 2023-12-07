@@ -1,11 +1,11 @@
 
-var playButton = new ui.Button(0, 0, 0, 0, "rect", "Play")
+var playButton = new ui.Button("rect", "Play")
 playButton.bgColour = [0, 0, 0, 0.5]
 
-var instructionsButton = new ui.Button(0, 0, 0, 0, "rect", "Instructions")
+var instructionsButton = new ui.Button("rect", "Instructions")
 instructionsButton.bgColour = [0, 0, 0, 0.5]
 
-var usernameTo = new ui.TextBox(0, 0, 0, 0, "Username")
+var usernameTo = new ui.TextBox("Username")
 
 let lusername = localStorage.getItem("username")
 if (lusername) {

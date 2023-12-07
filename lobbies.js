@@ -1,17 +1,17 @@
 
-var cLobbyName = new ui.TextBox(0, 0, 0, 0, "Lobby Name")
+var cLobbyName = new ui.TextBox("Lobby Name")
 
-var createLobbyButton = new ui.Button(0, 0, 0, 0, "rect", "Create Lobby")
+var createLobbyButton = new ui.Button("rect", "Create Lobby")
 createLobbyButton.bgColour = [0, 0, 0, 0.5]
 
-var backButton = new ui.Button(0, 0, 0, 0, "rect", "Back")
+var backButton = new ui.Button("rect", "Back")
 backButton.bgColour = [255, 0, 0, 0.5]
 
 var lobby = ""
 var lobbies = {}
 var lobbyData = {}
 
-var lobbiesC = new ui.Canvas(0, 0, 0, 0, [0, 0, 0, 0.5])
+var lobbiesC = new ui.Canvas([0, 0, 0, 0.5])
 
 var sm = 0
 var messageA = 0
@@ -23,14 +23,14 @@ var passUI = false
 var passA = 0
 var passLobby = ""
 
-var joinLobbyButton = new ui.Button(0, 0, 0, 0, "rect", "Join Lobby")
+var joinLobbyButton = new ui.Button("rect", "Join Lobby")
 joinLobbyButton.bgColour = [0, 255, 0, 0.5]
-var passTo = new ui.TextBox(0, 0, 0, 0, "Password")
-var cancelButton = new ui.Button(0, 0, 0, 0, "rect", "Cancel")
+var passTo = new ui.TextBox("Password")
+var cancelButton = new ui.Button("rect", "Cancel")
 cancelButton.bgColour = [255, 0, 0, 0.5]
 
-var privateTo = new ui.TextBox(0, 0, 0, 0, "Private Lobby Name")
-var joinLobbyButton2 = new ui.Button(0, 0, 0, 0, "rect", "Join Lobby")
+var privateTo = new ui.TextBox("Private Lobby Name")
+var joinLobbyButton2 = new ui.Button("rect", "Join Lobby")
 joinLobbyButton2.bgColour = [0, 0, 0, 0.5]
 
 function lobbiesTick() {

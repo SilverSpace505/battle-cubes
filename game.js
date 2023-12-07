@@ -15,32 +15,32 @@ function srand(seed) {
 	return x - Math.floor(x)
 }
 
-var menuButton = new ui.Button(0, 0, 0, 0, "rect", "Menu")
+var menuButton = new ui.Button("rect", "Menu")
 menuButton.bgColour = [0, 0, 0, 0.5]
 
-var respawnButton = new ui.Button(0, 0, 0, 0, "rect", "Respawn")
+var respawnButton = new ui.Button("rect", "Respawn")
 respawnButton.bgColour = [0, 0, 0, 0.5]
 
-var lobbyOButton = new ui.Button(0, 0, 0, 0, "rect", "Lobby Options")
+var lobbyOButton = new ui.Button("rect", "Lobby Options")
 lobbyOButton.bgColour = [0, 0, 0, 0.5]
 
-var loBackButton = new ui.Button(0, 0, 0, 0, "rect", "Back")
+var loBackButton = new ui.Button("rect", "Back")
 loBackButton.bgColour = [255, 0, 0, 0.5]
 
-var privateButton = new ui.Button(0, 0, 0, 0, "rect", "Public")
+var privateButton = new ui.Button("rect", "Public")
 privateButton.bgColour = [0, 0, 0, 0.5]
 
-var antihackButton = new ui.Button(0, 0, 0, 0, "rect", "Antihack")
+var antihackButton = new ui.Button("rect", "Antihack")
 antihackButton.bgColour = [0, 0, 0, 0.5]
 
-var resetStatsButton = new ui.Button(0, 0, 0, 0, "rect", "Reset Stats")
+var resetStatsButton = new ui.Button("rect", "Reset Stats")
 resetStatsButton.bgColour = [255, 0, 0, 0.5]
 
-var passwordTo = new ui.TextBox(0, 0, 0, 0, "Password")
+var passwordTo = new ui.TextBox("Password")
 
-var aisTo = new ui.TextBox(0, 0, 0, 0, "AIs")
+var aisTo = new ui.TextBox("AIs")
 
-var statsC = new ui.Canvas(0, 0, 0, 0, [0, 0, 0, 0.5])
+var statsC = new ui.Canvas([0, 0, 0, 0.5])
 
 var optType = 0
 
