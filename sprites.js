@@ -93,11 +93,13 @@ class Bullet extends Object3D {
                     ds.push([ai.pos, Math.sqrt((ai.pos.x-this.pos.x)**2 + (ai.pos.y-this.pos.y)**2 + (ai.pos.z-this.pos.z)**2)])
                 }
             }
-            ds.sort((a, b) => (a[1] - b[1]))
-            let moveDir = {x: (ds[0][0].x-this.pos.x)/ds[0][1], y: (ds[0][0].y-this.pos.y)/ds[0][1], z: (ds[0][0].z-this.pos.z)/ds[0][1]}
-            this.vel.x += moveDir.x * this.homing * delta
-            this.vel.y += moveDir.y * this.homing * delta
-            this.vel.z += moveDir.z * this.homing * delta
+            if (ds.length > 0) {
+                ds.sort((a, b) => (a[1] - b[1]))
+                let moveDir = {x: (ds[0][0].x-this.pos.x)/ds[0][1], y: (ds[0][0].y-this.pos.y)/ds[0][1], z: (ds[0][0].z-this.pos.z)/ds[0][1]}
+                this.vel.x += moveDir.x * this.homing * delta
+                this.vel.y += moveDir.y * this.homing * delta
+                this.vel.z += moveDir.z * this.homing * delta
+            }
         }
 
         if (this.vel2) {
