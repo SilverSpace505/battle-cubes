@@ -29,18 +29,18 @@ function connectToServer() {
     lobbies = {}
     lobbyData = {}
 	id = 0
-	ws = new WebSocket("wss://battle-cubes.glitch.me")
+	ws = new WebSocket("wss://server.silverspace.online")
 
     ws.addEventListener("open", (event) => {
-        sendMsg({"connect": true}, true)
+        sendMsg({connect: "battle-cubes"}, true)
     })
 
     ws.addEventListener("message", (event) => {
         var msg = JSON.parse(event.data)
-        if ("id" in msg) {
+        if ("connected" in msg) {
 			connected = true
-			console.log("Connected with id: " + msg.id)
-			id = msg.id
+			console.log("Connected with id: " + msg.connected)
+			id = msg.connected
 
             console.log("Ahh, i see you want to mess some stuff up, here's some variables to try out!")
             console.log("speed - player speed [default:250]")
