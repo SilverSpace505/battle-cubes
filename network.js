@@ -29,7 +29,7 @@ function connectToServer() {
     lobbies = {}
     lobbyData = {}
 	id = 0
-	ws = new WebSocket("wss://server.silverspace.online")
+	ws = new WebSocket("wss://server.silverspace.online:443")
 
     ws.addEventListener("open", (event) => {
         sendMsg({connect: "battle-cubes"}, true)
