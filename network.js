@@ -17,6 +17,22 @@ function sendMsg(sendData, bypass=false) {
 	}
 }
 
+var vid = ""
+var vidLoaded = localStorage.getItem("id")
+var letters = "abcdefghijklmnopqrstuvABCDEFGHIJKLMNOPQRS0123456789"
+if (vidLoaded) {
+	vid = vidLoaded
+} else {
+	for (let i = 0; i < 8; i++) {
+		vid += letters[Math.round(Math.random()*(letters.length-1))]
+	}
+	localStorage.setItem("id", vid)
+}
+
+function getViews() {
+	ws.send(JSON.stringify({getViews: true}))
+}
+
 function connectToServer() {
     console.log("Connecting...")
     if (ws) {
@@ -41,6 +57,7 @@ function connectToServer() {
 			connected = true
 			console.log("Connected with id: " + msg.connected)
 			id = msg.connected
+            sendMsg({view: vid})
 
             console.log("Ahh, i see you want to mess some stuff up, here's some variables to try out!")
             console.log("speed - player speed [default:250]")
@@ -57,6 +74,9 @@ function connectToServer() {
             console.log("drag - makes the bullet slow down, negative numbers make it go faster [default:0]")
             console.log("maxBullets - the max amount of bullets [default:50]")
 		}
+        if ("views" in msg) {
+            console.log(JSON.stringify(msg.views))
+        }
         if ("lobbies" in msg) {
             lobbies = msg.lobbies
             // if (lobby) {
