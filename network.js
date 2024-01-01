@@ -33,6 +33,8 @@ function getViews() {
 	ws.send(JSON.stringify({getViews: true}))
 }
 
+var wConnect = false
+
 function connectToServer() {
     console.log("Connecting...")
     if (ws) {
@@ -74,7 +76,7 @@ function connectToServer() {
             console.log("drag - makes the bullet slow down, negative numbers make it go faster [default:0]")
             console.log("maxBullets - the max amount of bullets [default:50]")
 		}
-        if ("ping" in msg) {
+        if ("ping" in msg && !document.hidden) {
             sendMsg({ping: true})
         }
         if ("views" in msg) {
@@ -165,7 +167,7 @@ function connectToServer() {
 
     ws.addEventListener("close", (event) => {
 		console.log("Disconnected from server")
-        connectToServer()
+        wConnect = true
 	})
 }
 

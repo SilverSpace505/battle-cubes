@@ -22,6 +22,11 @@ function lerp(start, end, multiply) {
 function tick(timestamp) {
 requestAnimationFrame(tick)
 
+    if (wConnect && !document.hidden) {
+        connectToServer()
+        wConnect = false
+    }
+
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
     gl.canvas.width = canvas.width
