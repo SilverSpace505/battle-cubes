@@ -74,6 +74,9 @@ function connectToServer() {
             console.log("drag - makes the bullet slow down, negative numbers make it go faster [default:0]")
             console.log("maxBullets - the max amount of bullets [default:50]")
 		}
+        if ("ping" in msg) {
+            sendMsg({ping: true})
+        }
         if ("views" in msg) {
             console.log(JSON.stringify(msg.views))
         }
