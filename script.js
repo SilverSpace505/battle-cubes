@@ -27,20 +27,24 @@ requestAnimationFrame(tick)
         wConnect = false
     }
 
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
-    gl.canvas.width = canvas.width
-    gl.canvas.height = canvas.height
-    uCanvas.width = window.innerWidth
-    uCanvas.height = window.innerHeight
+    ui.resizeCanvas()
+    ui.getSu()
+    // canvas.width = window.innerWidth
+    // canvas.height = window.innerHeight
+    glcanvas.width = canvas.width*ui.scale
+    glcanvas.height = canvas.height*ui.scale
+    gl.canvas.width = canvas.width*ui.scale
+    gl.canvas.height = canvas.height*ui.scale
+    // uCanvas.width = window.innerWidth
+    // uCanvas.height = window.innerHeight
     document.body.style.cursor = "default"
 
-    let aspect = canvas.width / targetSize.x
+    // let aspect = canvas.width / targetSize.x
 
-	su = aspect
-	if (su > canvas.height / targetSize.y) {
-		su = canvas.height / targetSize.y
-	}
+	// su = aspect
+	// if (su > canvas.height / targetSize.y) {
+	// 	su = canvas.height / targetSize.y
+	// }
 
     delta = (timestamp - lastTime) / 1000
 	lastTime = timestamp
@@ -79,8 +83,8 @@ var sensitivity = 0.005
 input.mouseMove = (event) => {
     if (!input.isMouseLocked()) {
         if (event.clientX) {
-            this.mouse.x = event.clientX
-            this.mouse.y = event.clientY
+            this.mouse.x = event.clientX/ui.scale
+            this.mouse.y = event.clientY/ui.scale
         }
     } else if (!isDead) {
         camera.rot.x -= event.movementY*sensitivity

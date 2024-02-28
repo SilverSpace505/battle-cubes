@@ -1,13 +1,15 @@
 
 utils.setGlobals()
 
-var canvas = document.getElementById("canvas")
-var gl = canvas.getContext("webgl2", { antialias: false })
+var glcanvas = document.getElementById("canvas")
+var gl = glcanvas.getContext("webgl2", { antialias: false })
 
-var uCanvas = document.getElementById("uCanvas")
-var ctx = uCanvas.getContext("2d")
+var canvas = document.getElementById("uCanvas")
+var ctx = canvas.getContext("2d")
 
 var webgl = new Webgl()
+
+utils.setStyles()
 
 var gravity = 0.3 * 60
 var speed = 250
